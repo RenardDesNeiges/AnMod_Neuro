@@ -1,5 +1,6 @@
 function [cycle,cycle_index,cycle_time] = get_cycle(ankle,hip,sr)
-%GET_CYCLE_LEN Summary of this function goes here
+%GET_CYCLE Returns the time of each walking cycle for a single leg's ankle
+%and hip y coordinates
 %   Detailed explanation goes here
     normalized_y_ankle = ankle-hip;
     normalized_y_ankle_speed = diff(normalized_y_ankle);
