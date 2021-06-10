@@ -1,5 +1,5 @@
 %%
-
+addpath(genpath('..'))
 clear
 % Loading the data
 
@@ -7,101 +7,97 @@ load('H01_TDM_2kmh.mat')
 
 
 %%
-% Parameters
-EMG = data.LTA;
+%EMG signals preparation
+% extensor : sol, ST , VLAT,MG
+% flexor : TA ,II, RF
 sr = data.EMG_sr;
 tmin = 0;
 tmax = 242900/sr;
 t = linspace(tmin,tmax,242900);
 
-%% Preparation of the EMG signal
+Flexors_left = [data.LTA, data.LIl, data.LRF];
+Flexors_right = [data.RTA, data.RIl, data.RRF];
+Extensors_left = [data.LSol, data.LST, data.LVLat, data.LMG];
+Extensors_right = [data.RSol, data.RST, data.RVLat, data.RMG];
 
-close all
+[r_F,c_F]=size(Flexors_left);
+Flexors_left_filtered = [];
+Flexors_right_filtered = [];
 
-% Step 1 - Slightly filter (band pass 10-2000 Hz) --> avec notre sampling
-% frequency on peut aller jusqu'à 1000
-Band  = [10/(sr/2), 999/(sr/2)];
-[b1, a1] = butter(2, Band, 'Bandpass');   
-signal_step1 = filter(b1, a1, EMG);
-figure
-plot(t', signal_step1)
-xlim([tmin,tmax])
-
-
-% Step 3 - High pass filter (30 Hz)
-High = 10/(sr/2);
-[b2,a2]=butter(2,High,'high'); 
-signal_step2 = filter(b2,a2,signal_step1);
-figure
-plot(t',signal_step2)
-xlim([tmin,tmax])
+for i=1:c_F
+    inter_l = Filter_EMG(Flexors_left(:,i),sr);
+    Flexors_left_filtered= [Flexors_left_filtered, inter_l];
+    inter_r = Filter_EMG(Flexors_right(:,i),sr);
+    Flexors_right_filtered= [Flexors_right_filtered, inter_r];
+end
 
 
+[r_E,c_E]=size(Extensors_left);
+Extensors_left_filtered = [];
+Extensors_right_filtered = [];
 
-% Step 2 - Signal rectification
-signal_step3 = abs(signal_step2);
-figure
-plot(t', signal_step3)
-xlim([tmin,tmax])
+for i=1:c_E
+    inter_l = Filter_EMG(Extensors_left(:,i),sr);
+    Extensors_left_filtered= [Extensors_left_filtered, inter_l];
+    inter_r = Filter_EMG(Extensors_right(:,i),sr);
+    Extensors_right_filtered= [Extensors_right_filtered, inter_r];
+end
 
 
-% Step 4 - Band stop filter (around 50 Hz)
-BandStop = [45/(sr/2), 55/(sr/2)];
-[b3,a3]=butter(2,BandStop,'stop');
-signal_step4 = filter(b3,a3,signal_step3);
-figure
-plot(t',signal_step4)
-xlim([tmin,tmax])
+%% Filtered muscle EMG plots
+plot (t,Flexors_left_filtered(:,:));
+% IL et RF inutiles (activity ~ 0)
+figure;
+plot (t,Extensors_left_filtered(:,:));
+% ST inutile (activity ~ 0)
+%% muscle activity params extraction
+%Flexors
+[r_F,c_F]=size(Flexors_left);
+Flexors_MEAN_left = [];
+Flexors_RMS_left = [];
+Flexors_integral_left = [];
+Flexors_MEAN_right = [];
+Flexors_RMS_right = [];
+Flexors_integral_right = [];
 
-% Step 5 - Low pass filter (10 Hz)
-Low = 10/(sr/2);
-[b4,a4]=butter(2,Low,'low'); 
-signal_step5 = filter(b4,a4,signal_step4);
-figure
-plot(t',signal_step5)
-xlim([tmin,tmax])
+for i=1:c_F
+    [mean_l,RMS_l,integ_l] = Extract_muscle_features(Flexors_left_filtered(:,i));
+    Flexors_MEAN_left= [Flexors_MEAN_left, mean_l];
+    Flexors_RMS_left= [Flexors_RMS_left, RMS_l];
+    Flexors_integral_left= [Flexors_integral_left, integ_l];
+    [mean_r,RMS_r,integ_r] = Extract_muscle_features(Flexors_right_filtered(:,i));
+    Flexors_MEAN_right= [Flexors_MEAN_right, mean_r];
+    Flexors_RMS_right= [Flexors_RMS_right, RMS_r];
+    Flexors_integral_right= [Flexors_integral_right, integ_r];
+    
+end
 
-%% Gait events detection
+%Extensors
+[r_F,c_F]=size(Flexors_left);
+Extensors_MEAN_left = [];
+Extensors_RMS_left = [];
+Extensors_integral_left = [];
+Extensors_MEAN_right = [];
+Extensors_RMS_right = [];
+Extensors_integral_right = [];
 
+for i=1:c_F
+    [mean_l,RMS_l,integ_l] = Extract_muscle_features(Extensors_left_filtered(:,i));
+    Extensors_MEAN_left= [Extensors_MEAN_left, mean_l];
+    Extensors_RMS_left= [Extensors_RMS_left, RMS_l];
+    Extensors_integral_left= [Extensors_integral_left, integ_l];
+    [mean_r,RMS_r,integ_r] = Extract_muscle_features(Extensors_right_filtered(:,i));
+    Extensors_MEAN_right= [Extensors_MEAN_right, mean_r];
+    Extensors_RMS_right= [Extensors_RMS_right, RMS_r];
+    Extensors_integral_right= [Extensors_integral_right, integ_r];
+    
+end
 %%
-% Plotting the markers
-
-% Parameters
-marker_sr = data.marker_sr;
-% Right:
-hip = data.RHIP;
-knee = data.RKNE;
-ankle = data.RANK;
-
-close all
-%plot(hip(:,2))
-normalized_y_ankle = ankle(:,2)-hip(:,2);
-normalized_y_ankle_speed = diff(normalized_y_ankle);
-
-Low = 7/(marker_sr/2);
-[b1, a1] = butter(2,Low,'low'); 
-normalized_y_ankle_speed_flt = filter(b1, a1, normalized_y_ankle_speed);
-
-
-
-
-zci = @(v) find(v(:).*circshift(v(:), [-1 0]) <= 0);
-
-zeros_ankle = (zci(normalized_y_ankle));
-zeros_ankle = zeros_ankle(1:end-1);
-
-derivative_when_zero = normalized_y_ankle_speed_flt(zeros_ankle);
-cycle = (1/marker_sr) * zeros_ankle( derivative_when_zero < 0);
-
-plot(normalized_y_ankle)
-hold on
-plot(normalized_y_ankle_speed_flt*15.0)
-
-plot(cycle,0,'o')
-
-%knee_low = filter(b2,a2,hip);
-%plot(knee(:,2))
-%figure
-%plot(knee_low(:,2))
+%One of the most common transformations used is the integration of 
+%the absolute values of the amplitudes of the EMG spikes.
+%Through this transformation, it has been found that the area 
+%under the graph of the absolute integral of the EMG is linearly
+%proportional to the strength of the muscle contraction.
+plot (t,Flexors_integral_left(:,:));
 
 
