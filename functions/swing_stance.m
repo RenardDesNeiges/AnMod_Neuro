@@ -1,7 +1,47 @@
-function [outputArg1,outputArg2] = swing_stance(inputArg1,inputArg2)
-%UNTITLED5 Summary of this function goes here
-%   Detailed explanation goes here
-outputArg1 = inputArg1;
-outputArg2 = inputArg2;
+function [stance_starts,swing_starts] = swing_stance(toe_y,ankle_y,toe_z,ankle_z)
+%swing_stance Detects swing and stance from mocap data
+%   takes :
+%   - toe y coordinate
+%   - toe z coordinate
+%   - ankle y coordinate
+%   - ankle z coordinate
+%   returns :
+%   - stance_starts a vector containing time of the begining of
+%   stance events
+%   - swing_starts a vector containing time of the begining of
+%   swing events
+
+    [pitch_foot_angle,pitch_angular_velocity] = ...
+        foot_pitch_vel(toe_y,ankle_y,toe_z,ankle_z);
+
+
+    zci = @(v) find(v(:).*circshift(v(:), [-1 0]) <= 0);
+
+    raw_zero_indices_pitch = zci(pitch_angular_velocity);
+    pitch_when_diff_0 = pitch_foot_angle(raw_zero_indices_pitch);
+    maxs = raw_zero_indices_pitch(pitch_when_diff_0 > -0.2);
+    mins = raw_zero_indices_pitch(pitch_when_diff_0 < -0.4);
+
+    stance_starts = [];
+    swing_starts = [];
+
+    prev_indice = -1000;
+
+
+     for i = 1:1:size(maxs,1)
+        if maxs(i)-prev_indice > 100
+           stance_starts = [stance_starts,maxs(i)];
+        end
+        prev_indice = maxs(i);
+     end
+
+     prev_indice = -1000;
+     for i = 1:1:size(mins,1)
+        if mins(i)-prev_indice > 100
+           swing_starts = [swing_starts,mins(i)];
+        end
+        prev_indice = mins(i);
+     end
+
 end
 

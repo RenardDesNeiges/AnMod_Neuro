@@ -1,6 +1,7 @@
 %% Script for the analysis of H01_TDM_2kmh.mat
 
 %clear workspace, load the data
+addpath(genpath('..'))
 clear 
 load('H01_TDM_2kmh.mat') % load the dataset
 s = struct; %feature structure
@@ -27,36 +28,22 @@ avg_cycle_time = mean([cycle_time_r,cycle_time_l]);
 var_cycle_time = var([cycle_time_r,cycle_time_l]);
 %%
 clf
-%hold off
-foot_y = toe_r(:,2)-ankle_r(:,2);
-foot_z = toe_r(:,3)-ankle_r(:,3);
-pitch_foot_angle = pi-mod(atan2(foot_z,foot_y),2*pi);
-pitch_angular_velocity = diff(pitch_foot_angle);
-plot(pitch_foot_angle(:)*0.04)
+clc
+
+[pitch_foot_angle,pitch_angular_velocity] = ...
+        foot_pitch_vel(toe_r(:,2),ankle_r(:,2),toe_r(:,3),ankle_r(:,3));
+plot(pitch_foot_angle()*0.04)
 hold on 
-%plot(pitch_angular_velocity(:))
 
 
+[stance_starts_r,swing_starts_r] = ...
+        swing_stance(toe_r(:,2),ankle_r(:,2),toe_r(:,3),ankle_r(:,3));
+    
+[stance_starts_l,swing_starts_l] = ...
+        swing_stance(toe_l(:,2),ankle_l(:,2),toe_l(:,3),ankle_l(:,3));
 
-Low = 5/(marker_sr/2);
-[b4,a4]=butter(4,Low,'low'); 
-flt_abs = filter(b4,a4,(abs(pitch_angular_velocity(:))));
-flt = filter(b4,a4,(pitch_angular_velocity(:)));
-%plot(flt());
-
-zci = @(v) find(v(:).*circshift(v(:), [-1 0]) <= 0);
-
-raw_zero_indices_pitch = zci(pitch_angular_velocity)
-pitch_when_diff_0 = pitch_foot_angle(raw_zero_indices_pitch)
-zero_indices_pitch = zero_indices_pitch(raw_zero_indices_pitch > -2e-3)
-
-plot(zero_indices_pitch,0,'o')
-
-logic = (flt < 0.006);
-%plot(logic()*0.02)
-%hold on
-%plot(foot_y)
-%plot(foot_z)
+plot(stance_starts_r,0,'or')
+plot(swing_starts_r,0,'ok')
 
 %% setting structure parameters 
 s.avg_cycle_time = avg_cycle_time;  % in seconds
