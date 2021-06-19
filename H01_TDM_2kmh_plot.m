@@ -41,25 +41,21 @@ color_map = [1:1:size(r_ankle,1)]';
 
 %% swing - stance phase segmentation
 
-[stance_starts_indices_r,swing_starts_indices_r] = ...
-        swing_stance(toe_r(:,2),ankle_r(:,2),toe_r(:,3),ankle_r(:,3));
+[stance_starts_indices_r,swing_starts_indices_r,swing_stange_seg_r] = ...
+        swing_stance(r_toe(:,2),r_ankle(:,2),r_toe(:,3),r_ankle(:,3));
     
-[stance_starts_indices_l,swing_starts_indices_l] = ...
-        swing_stance(toe_l(:,2),ankle_l(:,2),toe_l(:,3),ankle_l(:,3));
-
-    
-color_left = []
-color_right = []
+[stance_starts_indices_l,swing_starts_indices_l,swing_stange_seg_l] = ...
+        swing_stance(l_toe(:,2),l_ankle(:,2),l_toe(:,3),l_ankle(:,3));
 
 %% Displaying the motion capture data
 clf
 hold on 
-pcshow(c_l_ankle,color_map)
-pcshow(c_r_ankle,color_map)
-pcshow(c_l_hip,color_map)
-pcshow(c_r_hip,color_map)
-pcshow(c_l_kne,color_map)
-pcshow(c_r_kne,color_map)
-pcshow(c_l_toe,color_map)
-pcshow(c_r_toe,color_map)
+pcshow(c_l_ankle,swing_stange_seg_l)
+pcshow(c_r_ankle,swing_stange_seg_r)
+pcshow(c_l_hip,swing_stange_seg_l)
+pcshow(c_r_hip,swing_stange_seg_r)
+pcshow(c_l_kne,swing_stange_seg_l)
+pcshow(c_r_kne,swing_stange_seg_r)
+pcshow(c_l_toe,swing_stange_seg_l)
+pcshow(c_r_toe,swing_stange_seg_r)
 hold off

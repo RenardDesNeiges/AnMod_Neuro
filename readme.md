@@ -13,3 +13,5 @@
 | step height normalized to stance height |                                       |
 | stance width                            |                                       |
 
+*Motion capture data from the H01_TDM_2kmh timeseries :*
+![mocap_cloud_test](./figures/mocap_cloud_test.jpg)

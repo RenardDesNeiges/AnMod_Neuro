@@ -1,4 +1,5 @@
-function [stance_starts_indices,swing_starts_indices] = swing_stance(toe_y,ankle_y,toe_z,ankle_z)
+function [stance_starts_indices,swing_starts_indices,swing_stance_seg] = ...
+                            swing_stance(toe_y,ankle_y,toe_z,ankle_z)
 %swing_stance Detects swing and stance from mocap data
 %   takes :
 %   - toe y coordinate
@@ -10,6 +11,7 @@ function [stance_starts_indices,swing_starts_indices] = swing_stance(toe_y,ankle
 %   stance events
 %   - swing_starts a vector containing time of the begining of
 %   swing events
+%   - swing_stance_seg a vector containing stance segmentation 
 
     [pitch_foot_angle,pitch_angular_velocity] = ...
         foot_pitch_vel(toe_y,ankle_y,toe_z,ankle_z);
@@ -42,6 +44,29 @@ function [stance_starts_indices,swing_starts_indices] = swing_stance(toe_y,ankle
         end
         prev_indice = mins(i);
      end
-
+     
+     stance_labelled_indices = [stance_starts_indices; ...
+         -ones(size(stance_starts_indices))];
+     swing_labelled_indices = [swing_starts_indices; ...
+         ones(size(stance_starts_indices))];
+     transition_indices = [stance_labelled_indices,...
+         swing_labelled_indices];
+     [~,idx] = sort(transition_indices(1,:));
+     transition_indices = transition_indices(:,idx);
+     
+     swing_stance_seg = zeros(size(toe_y,2));
+     for i = transition_indices
+         index = i(1);
+         class = i(2);
+         update = swing_stance_seg + class * ...
+             [ones(1,index),zeros(1,size(toe_y,1)-index)];
+         if max(update)-min(update) < 2
+             swing_stance_seg = update;
+         end
+     end
+     
+     if max(swing_stance_seg) < 1
+        swing_stance_seg = swing_stance_seg + 1;
+     end
 end
 
