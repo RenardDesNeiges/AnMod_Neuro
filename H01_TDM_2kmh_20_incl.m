@@ -3,7 +3,7 @@
 %clear workspace, load the data
 addpath(genpath('..'))
 clear 
-load('H01_TDM_2kmh.mat') % load the dataset 
+load('H01_TDM_2kmh.mat') % load the dataset
 velocity = 2; %velocity in km/h
 s = struct; %feature structure
 
@@ -59,4 +59,4 @@ s.avg_stance_proportion = avg_stance_proportion;    % unitless
 s.var_stance_proportion = var_stance_proportion;    % unitless
 
 %% exporting the data to a file
-save('./features/H01_TDM_2kmh_features.mat','s')
+save('../features/H01_TDM_2kmh_features.mat','s')

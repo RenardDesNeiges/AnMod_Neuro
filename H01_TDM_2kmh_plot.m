@@ -3,7 +3,8 @@
 %clear workspace, load the data
 addpath(genpath('..'))
 clear 
-load('H01_TDM_2kmh.mat') % load the dataset
+load('H01_TDM_35kmh.mat') % load the dataset
+velocity = 2; %velocity in km/h
 s = struct; %feature structure
 
 %% Getting the data
