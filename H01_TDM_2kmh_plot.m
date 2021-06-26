@@ -5,7 +5,7 @@ addpath(genpath('..'))
 clear 
 load('H01_TDM_35kmh.mat') % load the dataset
 velocity = 2; %velocity in km/h
-s = struct; %feature structure
+s = struct; %feature structurex 
 
 %% Getting the data
 
