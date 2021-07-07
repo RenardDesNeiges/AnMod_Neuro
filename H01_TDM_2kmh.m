@@ -12,7 +12,7 @@ show_plots = true; %set to true to display results
 %dock the figures by default to prevent mental breakdown
 set(0,'DefaultFigureWindowStyle','docked') 
 
-%% Gait events detection (from motion capture data)
+% Gait events detection (from motion capture data)
 clc
 close all
 

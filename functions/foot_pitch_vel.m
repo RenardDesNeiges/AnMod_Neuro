@@ -6,6 +6,7 @@ function [pitch_foot_angle,pitch_angular_velocity] = foot_pitch_vel(toe_y,ankle_
     foot_z = toe_z-ankle_z;
 
     pitch_foot_angle = pi-mod(atan2(foot_z,foot_y),2*pi);
+    pitch_foot_angle = pitch_foot_angle - mean(pitch_foot_angle) - 0.4;
     pitch_angular_velocity = diff(pitch_foot_angle);
 
 end
