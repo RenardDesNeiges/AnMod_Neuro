@@ -145,14 +145,14 @@ if show_plots == true
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% amplitude of oscillation for different joints
+% amplitude of oscillation for knee joint
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-[angular_velocity_l,angle_l] = knee_pitch_vel(hip_l,knee_l,ankle_l);
-[angular_velocity_r,angle_r] = knee_pitch_vel(hip_r,knee_r,ankle_r);
+[knee_angular_velocity_l,knee_angle_l] = knee_pitch_vel(hip_l,knee_l,ankle_l);
+[knee_angular_velocity_r,knee_angle_r] = knee_pitch_vel(hip_r,knee_r,ankle_r);
 
-knee_amplitude_l = 2*sqrt(mean((abs(angle-mean(angle_l)))));
-knee_amplitude_r = 2*sqrt(mean((abs(angle-mean(angle_r)))));
+knee_amplitude_l = 2*sqrt(mean((abs(knee_angle_l-mean(knee_angle_l)))));
+knee_amplitude_r = 2*sqrt(mean((abs(knee_angle_r-mean(knee_angle_r)))));
 knee_amp_asymetry = abs((knee_amplitude_l-knee_amplitude_r)/...
     (knee_amplitude_l+knee_amplitude_r));
 
@@ -173,6 +173,33 @@ if show_plots == true
     set(t,'Interpreter','none')
 end
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% amplitude of oscillation for hip joint
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+[hip_angular_velocity_l,hip_angle_l] = hip_angle_vel(hip_l,knee_l);
+[hip_angular_velocity_r,hip_angle_r] = hip_angle_vel(hip_r,knee_r);
+
+hip_amplitude_l = 2*sqrt(mean((abs(hip_angle_l-mean(hip_angle_l)))));
+hip_amplitude_r = 2*sqrt(mean((abs(hip_angle_r-mean(hip_angle_r)))));
+hip_amp_asymetry = abs((hip_amplitude_l-hip_amplitude_r)/...
+                                (hip_amplitude_l+hip_amplitude_r));
+                            
+if show_plots == true
+    figure
+    [~,angle] = hip_angle_vel(hip_l(501:1500,:),knee_l(501:1500,:));
+    % plotting stance - swing segmentation
+    set(gcf,'color','w');
+    times = (1/marker_sr) * (1:1:1000);
+	plot(times,angle)
+    hold on
+    xlabel("time [s]")
+    ylabel('hip angle [rad]')
+    t = title(strcat(...
+        "hip angle over time, time series : ",...
+        name)); % avoids interpreting _ as latex
+    set(t,'Interpreter','none')
+end
 
 
 %%
