@@ -121,7 +121,7 @@ var_stance_proportion = var([swing_stange_seg_r,swing_stange_seg_l]-...
 % getting stance times
 avg_step_height = mean([max_height_r;max_height_l]);
 var_step_height = var([max_height_r;max_height_l]-avg_step_height);
-height_disymmetry = abs(mean(max_height_r)/...
+height_disymmetry = abs((mean(max_height_r)-mean(max_height_l))/...
                 (mean(max_height_r)+mean(max_height_l)));
 
 if show_plots == true
@@ -144,6 +144,34 @@ if show_plots == true
     set(t,'Interpreter','none')
 end
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% amplitude of oscillation for different joints
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+[angular_velocity_l,angle_l] = knee_pitch_vel(hip_l,knee_l,ankle_l);
+[angular_velocity_r,angle_r] = knee_pitch_vel(hip_r,knee_r,ankle_r);
+
+knee_amplitude_l = 2*sqrt(mean((abs(angle-mean(angle_l)))));
+knee_amplitude_r = 2*sqrt(mean((abs(angle-mean(angle_r)))));
+knee_amp_asymetry = abs((knee_amplitude_l-knee_amplitude_r)/...
+    (knee_amplitude_l+knee_amplitude_r));
+
+if show_plots == true
+    figure
+    [angular_velocity,angle] = knee_pitch_vel(hip_l(501:1500,:),...
+        knee_l(501:1500,:),ankle_l(501:1500,:));
+    % plotting stance - swing segmentation
+    set(gcf,'color','w');
+    times = (1/marker_sr) * (1:1:1000);
+	plot(times,angle)
+    hold on
+    xlabel("time [s]")
+    ylabel('knee angle [rad]')
+    t = title(strcat(...
+        "knee angle over time, time series : ",...
+        name)); % avoids interpreting _ as latex
+    set(t,'Interpreter','none')
+end
 
 
 
@@ -239,14 +267,17 @@ end
 
 
 %% setting structure parameters 
-s.avg_cycle_time = avg_cycle_time;                  % in seconds
-s.var_cycle_time = var_cycle_time;                  % in seconds
-s.velocity = velocity/3.6;                          % in meter/second
-s.avg_stance_proportion = avg_stance_proportion;    % unitless
-s.var_stance_proportion = var_stance_proportion;    % unitless
-s.avg_step_height = avg_step_height;                % in mm
-s.var_step_height = var_step_height;                % in mm
-s.height_disymmetry = height_disymmetry;            % unitless
+s.avg_cycle_time = avg_cycle_time;                  % in seconds        1
+s.var_cycle_time = var_cycle_time;                  % in seconds        2
+s.velocity = velocity/3.6;                          % in meter/second   3
+s.avg_stance_proportion = avg_stance_proportion;    % unitless          4
+s.var_stance_proportion = var_stance_proportion;    % unitless          5
+s.avg_step_height = avg_step_height;                % in mm             6
+s.var_step_height = var_step_height;                % in mm             7
+s.height_disymmetry = height_disymmetry;            % unitless          8
+s.knee_amplitude_l = knee_amplitude_l;              % in radients       9
+s.knee_amplitude_r = knee_amplitude_r;              % in radients       10
+s.knee_amp_asymetry = knee_amp_asymetry;            % in radients       11
 
 %% EMG features
 s.Extensors_MEAN_left = Extensors_MEAN_left;
