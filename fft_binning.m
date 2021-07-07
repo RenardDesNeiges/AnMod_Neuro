@@ -47,15 +47,16 @@ title('Im(fft)')
 
 re = [];
 im = [];
-for i = 1:500:(size(foot_pitch_fft,1)-500)
-    re = [re, sum(fft_real(i:i+500))];
-    im = [im, sum(fft_img(i:i+500))];
+amp = 100
+for i = 1:amp:(size(foot_pitch_fft,1)-amp)
+    re = [re, sum(fft_real(i:i+amp))];
+    im = [im, sum(fft_img(i:i+amp))];
 end
 
 
 subplot(2,3,5)
-imagesc(im)
+imagesc(im(100:145))
 title("Im(fft) vector")
 subplot(2,3,6)
-imagesc(re)
+imagesc(re(100:145))
 title("Re(fft) vector")
