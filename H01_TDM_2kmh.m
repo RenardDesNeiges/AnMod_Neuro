@@ -173,7 +173,40 @@ if show_plots == true
     set(t,'Interpreter','none')
 end
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ankle angle 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+knee_right = data.RKNE;
+ankle_right = data.RANK;
+toe_right = data.RTOE;
+
+knee_left = data.LKNE;
+ankle_left = data.LANK;
+toe_left = data.LTOE;
+
+% sagital plane :
+vec1_r = knee_right - ankle_right;
+vec2_r = ankle_right - toe_right;
+prod_r = dot(vec1_r(:,2,3), vec2_r(:,2,3)) / dot(vecnorm(vec1_r(:,2,3)), vecnorm(vec2_r(:,2,3)));
+
+vec1_l = knee_left - ankle_left;
+vec2_l = ankle_left - toe_left;
+prod_l = dot(vec1_l(:,2,3), vec2_l(:,2,3)) / dot(vecnorm(vec1_l(:,2,3)), vecnorm(vec2_l(:,2,3)));
+
+angle_r = acos(prod_r);
+angle_l = acos(prod_l);
+
+if show_plot == true
+    figure 
+    set(gcf,'color','w');
+    times = (1/marker_sr) * (1:1:1000);
+    plot(times,ankle_r(501:1500))
+    hold on
+    plot(times, ankle_l(501:1500))
+    xlabel("time [s]")
+    ylabel("Ankle angle [rad]")
+end
 
 %%
 %EMG signals preparation
