@@ -12,7 +12,7 @@ show_plots = true; %set to true to display results
 %dock the figures by default to prevent mental breakdown
 set(0,'DefaultFigureWindowStyle','docked') 
 
-%% Gait events detection
+%% Gait events detection (from motion capture data)
 clc
 close all
 
@@ -202,41 +202,37 @@ if show_plots == true
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% ankle angle
+% amplitude of oscillation for ankle joint
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% knee_right = data.RKNE;
-% ankle_right = data.RANK;
-% toe_right = data.RTOE;
-% 
-% knee_left = data.LKNE;
-% ankle_left = data.LANK;
-% toe_left = data.LTOE;
-% 
-% % sagital plane :
-% vec1_r = knee_right - ankle_right;
-% vec2_r = ankle_right - toe_right;
-% prod_r = dot(vec1_r(:,2,3), vec2_r(:,2,3)) / dot(vecnorm(vec1_r(:,2,3)), vecnorm(vec2_r(:,2,3)));
-% 
-% vec1_l = knee_left - ankle_left;
-% vec2_l = ankle_left - toe_left;
-% prod_l = dot(vec1_l(:,2,3), vec2_l(:,2,3)) / dot(vecnorm(vec1_l(:,2,3)), vecnorm(vec2_l(:,2,3)));
-% 
-% angle_r = acos(prod_r);
-% angle_l = acos(prod_l);
-% 
-% if show_plot == true
-%     figure 
-%     set(gcf,'color','w');
-%     times = (1/marker_sr) * (1:1:1000);
-%     plot(times,ankle_r(501:1500))
-%     hold on
-%     plot(times, ankle_l(501:1500))
-%     xlabel("time [s]")
-%     ylabel("Ankle angle [rad]")
-% end
+[ankle_angular_velocity_l,ankle_angle_l] = ...
+       ankle_pitch_vel(knee_l,ankle_l,toe_l);
+[ankle_angular_velocity_r,ankle_angle_r] = ...
+    ankle_pitch_vel(knee_r,ankle_r,toe_r);
 
-%%
+ankle_amplitude_l = 2*sqrt(mean((abs(ankle_angle_l-mean(ankle_angle_l)))));
+ankle_amplitude_r = 2*sqrt(mean((abs(ankle_angle_r-mean(ankle_angle_r)))));
+ankle_amp_asymetry = abs((ankle_amplitude_l-ankle_amplitude_r)/...
+                                (ankle_amplitude_l+ankle_amplitude_r));
+
+if show_plots == true
+    figure
+    [~,angle] = ...
+        ankle_pitch_vel(knee_l(501:1500,:),ankle_l(501:1500,:),...
+        toe_l(501:1500,:));
+    % plotting stance - swing segmentation
+    set(gcf,'color','w');
+    times = (1/marker_sr) * (1:1:1000);
+	plot(times,angle)
+    hold on
+    xlabel("time [s]")
+    ylabel('ankle angle [rad]')
+    t = title(strcat(...
+        "ankle angle over time, time series : ",...
+        name)); % avoids interpreting _ as latex
+    set(t,'Interpreter','none')
+end
+
 %EMG signals preparation
 % extensor : sol, ST , VLAT,MG
 % flexor : TA ,II, RF
@@ -277,12 +273,82 @@ for i=1:c_E
 end
 
 
-%% Filtered muscle EMG plots
-plot (t,Flexors_left_filtered(:,:));
-% IL et RF inutiles (activity ~ 0)
-figure;
-plot (t,Extensors_left_filtered(:,:));
-% ST inutile (activity ~ 0)
+% Filtered muscle EMG plots
+
+
+
+if show_plots
+    figure
+    set(gcf,'color','w');
+    
+    subplot(3,1,1)
+    plot(t(10000:30000),Flexors_left_filtered(10000:30000,1));
+    xlabel("time [s]")
+    ylabel('ankle angle [rad]')
+    tx = title(strcat(...
+        "TA EMG, time series : ",...
+        name)); % avoids interpreting _ as latex
+    set(tx,'Interpreter','none')
+    
+    subplot(3,1,2)
+    plot(t(10000:30000),Flexors_left_filtered(10000:30000,2));
+    xlabel("time [s]")
+    ylabel('ankle angle [rad]')
+    tx = title(strcat(...
+        "II EMG, time series : ",...
+        name)); % avoids interpreting _ as latex
+    set(tx,'Interpreter','none')
+    
+    subplot(3,1,3)
+    plot(t(10000:30000),Flexors_left_filtered(10000:30000,3));
+    xlabel("time [s]")
+    ylabel('ankle angle [rad]')
+    tx = title(strcat(...
+        "RF EMG, time series : ",...
+        name)); % avoids interpreting _ as latex
+    set(tx,'Interpreter','none')
+    
+    figure
+    
+    subplot(4,1,1)
+    plot (t(10000:30000),Extensors_left_filtered(10000:30000,1));
+    xlabel("time [s]")
+    ylabel('activity [mV]')
+    tx = title(strcat(...
+        "sol EMG, time series : ",...
+        name)); % avoids interpreting _ as latex
+    set(tx,'Interpreter','none')
+    
+    subplot(4,1,2)
+    plot (t(10000:30000),Extensors_left_filtered(10000:30000,2));
+    xlabel("time [s]")
+    ylabel('activity [mV]')
+    tx = title(strcat(...
+        "ST EMG, time series : ",...
+        name)); % avoids interpreting _ as latex
+    set(tx,'Interpreter','none')
+    
+    subplot(4,1,3)
+    plot (t(10000:30000),Extensors_left_filtered(10000:30000,3));
+    xlabel("time [s]")
+    ylabel('activity [mV]')
+    tx = title(strcat(...
+        "VLAT EMG, time series : ",...
+        name)); % avoids interpreting _ as latex
+    set(tx,'Interpreter','none')
+    
+    subplot(4,1,4)
+    plot (t(10000:30000),Extensors_left_filtered(10000:30000,4));
+    
+    xlabel("time [s]")
+    ylabel('activity [mV]')
+    tx = title(strcat(...
+        "MG EMG, time series : ",...
+        name)); % avoids interpreting _ as latex
+    set(tx,'Interpreter','none')
+    set(gcf,'color','w');
+end
+
 %% muscle activity params extraction
 %Flexors
 [r_F,c_F]=size(Flexors_left);
@@ -362,6 +428,9 @@ s.height_disymmetry = height_disymmetry;            % unitless          8
 s.knee_amplitude_l = knee_amplitude_l;              % in radients       9
 s.knee_amplitude_r = knee_amplitude_r;              % in radients       10
 s.knee_amp_asymetry = knee_amp_asymetry;            % in radients       11
+s.ankle_amplitude_l = ankle_amplitude_l;            % in radients       12
+s.ankle_amplitude_r = ankle_amplitude_r;            % in radients       13
+s.ankle_amp_asymetry = ankle_amp_asymetry;          % in radients       14
 
 % EMG features
 %Extensors:
