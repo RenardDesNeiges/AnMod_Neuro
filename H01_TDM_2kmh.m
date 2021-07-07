@@ -13,7 +13,7 @@ show_plots = true; %set to true to display results
 set(0,'DefaultFigureWindowStyle','docked') 
 
 %% Gait events detection
-
+clc
 close all
 
 marker_sr = data.marker_sr;
@@ -41,8 +41,7 @@ toe_l = data.LTOE;
     get_cycle(ankle_l(:,2),hip_l(:,2),marker_sr);
 
 avg_cycle_time = mean([cycle_time_r,cycle_time_l]);
-
-var_cycle_time = var([cycle_time_r,cycle_time_l]);
+var_cycle_time = var([cycle_time_r,cycle_time_l]-avg_cycle_time);
 
 if show_plots == true
     figure
@@ -106,7 +105,47 @@ if show_plots == true
 end
 
 avg_stance_proportion = mean([swing_stange_seg_r,swing_stange_seg_l]);
-var_stance_proportion = var([swing_stange_seg_r,swing_stange_seg_l]);
+var_stance_proportion = var([swing_stange_seg_r,swing_stange_seg_l]-...
+                                                    avg_stance_proportion);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% step height
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+[max_height_r,max_height_times_r,max_height_indices_r] = ...
+    max_heights(ankle_r(:,3),350,marker_sr);
+[max_height_l,max_height_times_l,max_height_indices_l] = ...
+    max_heights(ankle_l(:,3),350,marker_sr);
+
+% getting stance times
+avg_step_height = mean([max_height_r;max_height_l]);
+var_step_height = var([max_height_r;max_height_l]-avg_step_height);
+height_disymmetry = abs(mean(max_height_r)/...
+                (mean(max_height_r)+mean(max_height_l)));
+
+if show_plots == true
+    figure
+    ankle_height = ankle_r(501:1500,3);
+    [max_height,max_times,max_indices] = ...
+        max_heights(ankle_height,350,marker_sr);
+    % plotting stance - swing segmentation
+    set(gcf,'color','w');
+    times = (1/marker_sr) * (1:1:1000);
+	plot(times,ankle_height')
+    hold on
+    plot(max_indices * (1/marker_sr),max_height,'or')
+    xlabel("time [s]")
+    %ylabel('pitch angle [rad]')
+    t = title(strcat(...
+        "step (ankle) height with event detection",...
+        " events for time series : ",...
+        name)); % avoids interpreting _ as latex
+    set(t,'Interpreter','none')
+end
+
+
+
 
 %%
 %EMG signals preparation
@@ -205,8 +244,11 @@ s.var_cycle_time = var_cycle_time;                  % in seconds
 s.velocity = velocity/3.6;                          % in meter/second
 s.avg_stance_proportion = avg_stance_proportion;    % unitless
 s.var_stance_proportion = var_stance_proportion;    % unitless
+s.avg_step_height = avg_step_height;                % in mm
+s.var_step_height = var_step_height;                % in mm
+s.height_disymmetry = height_disymmetry;            % unitless
 
-% EMG features
+%% EMG features
 s.Extensors_MEAN_left = Extensors_MEAN_left;
 s.Extensors_RMS_left = Extensors_RMS_left;
 s.Extensors_integral_left = Extensors_integral_left;
@@ -221,8 +263,5 @@ s.Flexors_RMS_right = Flexors_RMS_right;
 s.Flexors_integral_right = Flexors_integral_right;
 
 %% exporting the data to a file
-<<<<<<< HEAD
+
 save(strcat('./features/',name,'_features.mat'),'s')
-=======
-save('./features/H01_TDM_2kmh_features.mat','s')
->>>>>>> 7cf709c2795c20c4cf3cc63dfccecf1b550c0a6a
