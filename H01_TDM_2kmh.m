@@ -77,15 +77,23 @@ stance_starts_l = stance_starts_indices_l * (1/marker_sr);
 swing_starts_r = swing_starts_indices_r * (1/marker_sr);
 swing_starts_l = swing_starts_indices_l * (1/marker_sr);
 
-[pitch_foot_angle,pitch_angular_velocity] = ...
+[pitch_foot_angle_l,pitch_angular_velocity_l] = ...
+       foot_pitch_vel(toe_l(:,2),ankle_l(:,2),toe_l(:,3),ankle_l(:,3));
+[pitch_foot_angle_r,pitch_angular_velocity_r] = ...
        foot_pitch_vel(toe_r(:,2),ankle_r(:,2),toe_r(:,3),ankle_r(:,3));
 
+   
+foot_amplitude_l = 2*sqrt(mean((abs(pitch_foot_angle_l-mean(pitch_foot_angle_l)))));
+foot_amplitude_r = 2*sqrt(mean((abs(pitch_foot_angle_r-mean(pitch_foot_angle_r)))));
+foot_amp_asymetry = abs((foot_amplitude_l-foot_amplitude_r)/...
+                                (foot_amplitude_l+foot_amplitude_r));
+   
 if show_plots == true
     figure
     % plotting stance - swing segmentation
     set(gcf,'color','w');
     times = (1/marker_sr) * (1:1:1000);
-	plot(times,pitch_foot_angle(501:1500)');
+	plot(times,pitch_foot_angle_r(501:1500)');
     hold on
 	plot(stance_starts_r(( ...
         stance_starts_r<1500*(1/marker_sr)) & ...
@@ -233,13 +241,40 @@ if show_plots == true
     set(t,'Interpreter','none')
 end
 
-%EMG signals preparation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% correlation between different angle signals
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+[ankle_knee_angle_corr,ankle_knee_angle_asymetry] = ...
+    correlate_leg_signals(ankle_angle_l,ankle_angle_r, ...
+    knee_angle_l,knee_angle_r);
+
+[ankle_foot_angle_corr,ankle_foot_angle_asymetry] = ...
+    correlate_leg_signals(ankle_angle_l,ankle_angle_r, ...
+    pitch_foot_angle_l',pitch_foot_angle_r');
+
+[ankle_hip_angle_corr,ankle_hip_angle_asymetry] = ...
+    correlate_leg_signals(ankle_angle_l,ankle_angle_r, ...
+    hip_angle_l,hip_angle_r);
+
+[foot_knee_angle_corr,foot_knee_angle_asymetry] = ...
+    correlate_leg_signals(pitch_foot_angle_l',pitch_foot_angle_r', ...
+    knee_angle_l,knee_angle_r);
+
+[hip_knee_angle_corr,hip_knee_angle_asymetry] = ...
+    correlate_leg_signals(hip_angle_l,hip_angle_r, ...
+    knee_angle_l,knee_angle_r);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%EMG signals preparation (filtering)
 % extensor : sol, ST , VLAT,MG
 % flexor : TA ,II, RF
-sr = data.EMG_sr;
-%sr= EMG.sampFq;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+emg_sr = data.EMG_sr;
+
 tmin = 0;
-tmax = 242900/sr;
+tmax = 242900/emg_sr;
 t = linspace(tmin,tmax,242900);
 delta_time = 1200.0 ;
 
@@ -253,9 +288,9 @@ Flexors_left_filtered = [];
 Flexors_right_filtered = [];
 
 for i=1:c_F
-    inter_l = Filter_EMG(Flexors_left(:,i),sr);
+    inter_l = Filter_EMG(Flexors_left(:,i),emg_sr);
     Flexors_left_filtered= [Flexors_left_filtered, inter_l];
-    inter_r = Filter_EMG(Flexors_right(:,i),sr);
+    inter_r = Filter_EMG(Flexors_right(:,i),emg_sr);
     Flexors_right_filtered= [Flexors_right_filtered, inter_r];
 end
 
@@ -265,17 +300,16 @@ Extensors_left_filtered = [];
 Extensors_right_filtered = [];
 
 for i=1:c_E
-    inter_l = Filter_EMG(Extensors_left(:,i),sr);
+    inter_l = Filter_EMG(Extensors_left(:,i),emg_sr);
     Extensors_left_filtered= [Extensors_left_filtered, inter_l];
-    inter_r = Filter_EMG(Extensors_right(:,i),sr);
+    inter_r = Filter_EMG(Extensors_right(:,i),emg_sr);
     
     Extensors_right_filtered= [Extensors_right_filtered, inter_r];
 end
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Filtered muscle EMG plots
-
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if show_plots
     figure
@@ -425,12 +459,29 @@ s.var_stance_proportion = var_stance_proportion;    % unitless          5
 s.avg_step_height = avg_step_height;                % in mm             6
 s.var_step_height = var_step_height;                % in mm             7
 s.height_disymmetry = height_disymmetry;            % unitless          8
-s.knee_amplitude_l = knee_amplitude_l;              % in radients       9
-s.knee_amplitude_r = knee_amplitude_r;              % in radients       10
-s.knee_amp_asymetry = knee_amp_asymetry;            % in radients       11
-s.ankle_amplitude_l = ankle_amplitude_l;            % in radients       12
-s.ankle_amplitude_r = ankle_amplitude_r;            % in radients       13
-s.ankle_amp_asymetry = ankle_amp_asymetry;          % in radients       14
+s.foot_amplitude_l = foot_amplitude_l;              % in radients       9
+s.foot_amplitude_r = foot_amplitude_r;              % in radients       10
+s.foot_amp_asymetry = foot_amp_asymetry;            % in radients       11
+s.knee_amplitude_l = knee_amplitude_l;              % in radients       12
+s.knee_amplitude_r = knee_amplitude_r;              % in radients       13
+s.knee_amp_asymetry = knee_amp_asymetry;            % in radients       14
+s.ankle_amplitude_l = ankle_amplitude_l;            % in radients       15
+s.ankle_amplitude_r = ankle_amplitude_r;            % in radients       16
+s.ankle_amp_asymetry = ankle_amp_asymetry;          % in radients       17
+s.ankle_knee_angle_corr = ankle_knee_angle_corr;    % unitless          18
+s.ankle_knee_angle_asymetry = ...                   % unitless          19
+        ankle_knee_angle_asymetry;
+s.ankle_foot_angle_corr = ankle_foot_angle_corr;    % unitless          20
+s.ankle_foot_angle_asymetry = ...                   % unitless          21
+    ankle_foot_angle_asymetry;
+s.ankle_hip_angle_corr = ankle_hip_angle_corr;      % unitless          22
+s.ankle_hip_angle_asymetry = ...
+    ankle_hip_angle_asymetry;                       % unitless          23
+s.foot_knee_angle_corr = foot_knee_angle_corr;      % unitless          24
+s.foot_knee_angle_asymetry = ...
+    foot_knee_angle_asymetry;                       % unitless          25
+s.hip_knee_angle_corr = hip_knee_angle_corr;        % unitless          26
+s.hip_knee_angle_asymetry = hip_knee_angle_asymetry;% unitless          27
 
 % EMG features
 %Extensors:
