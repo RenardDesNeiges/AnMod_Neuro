@@ -6,6 +6,7 @@ function [angular_velocity,angle] = hip_angle_vel(hip,knee)
 
     angle = acos(dot(thigh,vertical)./...
         (vecnorm(thigh,2,1).*vecnorm(vertical,2,1)));
+    angle = angle + ((angle> pi)*-pi);
     angular_velocity = diff(angle);
 
 end

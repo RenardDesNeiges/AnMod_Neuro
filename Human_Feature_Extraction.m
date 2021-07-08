@@ -5,8 +5,19 @@ addpath(genpath('..'))
 
 clear 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% | Dataset name         | Species | Condition                            |
+% | -------------------- | ------- | -------------------------------------|
+% | H01_TDM_2kmh         | Human   | Healthy, 2kmh walk                   |
+% | H01_TDM_35kmh        | Human   | Healthy, 3.5kmh walk                 |
+% | H01_TDM_2kmh_20_incl | Human   | Healthy, 2kmh walk on a slope (20°)  |
+% | DM002_TDM_08_2kmh    | Human   | SCI, EES treatement, 2kmh walk       |
+% | DM002_TDM_08_1kmh    | Human   | SCI, EES treatement, 1khm walk       |
+% | DM002_TDM_1kmh_NoEES | Human   | SCI, no EES treatement, 1kmh walk    |
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %change the file name here to get features from another dataset
-name = 'H01_TDM_2kmh'; 
+name = 'DM002_TDM_08_1kmh'; 
 
 load(strcat(name,'.mat')) % load the dataset 
 velocity = 2; %velocity in km/h
@@ -283,16 +294,16 @@ end
 emg_sr = data.EMG_sr;
 
 tmin = 0;
-tmax = 242900/emg_sr;
+tmax = size(data.RTA,1)/emg_sr;
 t = linspace(tmin,tmax,242900);
 delta_time = 1200.0 ;
 
-Flexors_left = [data.LTA, data.LIl, data.LRF];
-Flexors_right = [data.RTA, data.RIl, data.RRF];
+Flexors_left = [data.LTA, data.LRF];
+Flexors_right = [data.RTA, data.RRF];
 Extensors_left = [data.LSol, data.LST, data.LVLat, data.LMG];
 Extensors_right = [data.RSol, data.RST, data.RVLat, data.RMG];
 
-[r_F,c_F]=size(Flexors_left);
+[~,c_F]=size(Flexors_left);
 Flexors_left_filtered = [];
 Flexors_right_filtered = [];
 
@@ -304,7 +315,7 @@ for i=1:c_F
 end
 
 
-[r_E,c_E]=size(Extensors_left);
+[~,c_E]=size(Extensors_left);
 Extensors_left_filtered = [];
 Extensors_right_filtered = [];
 
@@ -487,32 +498,10 @@ avg_RTA_Offset_dt = mean(Flexors_RTA_Offset_dt);
 var_RTA_Onset_dt = var(Flexors_RTA_Onset_dt);
 var_RTA_Offset_dt = var(Flexors_RTA_Offset_dt);
 
-[Flexors_LIl_Onset_id,Flexors_LIl_Offset_id,...
-    Flexors_LIl_Onset_t,Flexors_LIl_Offset_t,...
-    Flexors_LIl_Onset_dt,Flexors_LIl_Offset_dt]= ...
-    onset_offset_extraction(Flexors_left_filtered(:,2), delta_time, ...
-    stance_starts_indices_l, swing_starts_indices_l,emg_sr);
-
-avg_LIl_Onset_dt = mean(Flexors_LIl_Onset_dt);
-avg_LIl_Offset_dt = mean(Flexors_LIl_Offset_dt);
-var_LIl_Onset_dt = var(Flexors_LIl_Onset_dt);
-var_LIl_Offset_dt = var(Flexors_LIl_Offset_dt);
-
-[Flexors_RIl_Onset_id,Flexors_RIl_Offset_id,...
-    Flexors_RIl_Onset_t,Flexors_RIl_Offset_t,...
-    Flexors_RIl_Onset_dt,Flexors_RIl_Offset_dt]= ...
-    onset_offset_extraction(Flexors_right_filtered(:,2), delta_time, ...
-    swing_starts_indices_r, stance_starts_indices_r,emg_sr);
-
-avg_RIl_Onset_dt = mean(Flexors_RIl_Onset_dt);
-avg_RIl_Offset_dt = mean(Flexors_RIl_Offset_dt);
-var_RIl_Onset_dt = var(Flexors_RIl_Onset_dt);
-var_RIl_Offset_dt = var(Flexors_RIl_Offset_dt);
-
 [Flexors_LRF_Onset_id,Flexors_LRF_Offset_id,...
     Flexors_LRF_Onset_t,Flexors_LRF_Offset_t,...
     Flexors_LRF_Onset_dt,Flexors_LRF_Offset_dt]= ...
-    onset_offset_extraction(Flexors_left_filtered(:,3), delta_time, ...
+    onset_offset_extraction(Flexors_left_filtered(:,2), delta_time, ...
     stance_starts_indices_l, swing_starts_indices_l,emg_sr);
 
 avg_LRF_Onset_dt = mean(Flexors_LRF_Onset_dt);
@@ -523,7 +512,7 @@ var_LRF_Offset_dt = var(Flexors_LRF_Offset_dt);
 [Flexors_RRF_Onset_id,Flexors_RRF_Offset_id,...
     Flexors_RRF_Onset_t,Flexors_RRF_Offset_t,...
     Flexors_RRF_Onset_dt,Flexors_RRF_Offset_dt]= ...
-    onset_offset_extraction(Flexors_right_filtered(:,3), delta_time, ...
+    onset_offset_extraction(Flexors_right_filtered(:,2), delta_time, ...
     swing_starts_indices_r, stance_starts_indices_r,emg_sr);
 
 avg_RRF_Onset_dt = mean(Flexors_LRF_Onset_dt);
@@ -540,7 +529,7 @@ if show_plots
     figure
     set(gcf,'color','w');
     
-    subplot(3,1,1)
+    subplot(2,1,1)
     plot(t(10000:30000),Flexors_left_filtered(10000:30000,1));
     hold on
     %plot(Flexors_LTA_Onset_times, ...
@@ -552,21 +541,12 @@ if show_plots
         name)); % avoids interpreting _ as latex
     set(tx,'Interpreter','none')
     
-    subplot(3,1,2)
+    subplot(2,1,2)
     plot(t(10000:30000),Flexors_left_filtered(10000:30000,2));
     xlabel("time [s]")
     ylabel('ankle angle [rad]')
     tx = title(strcat(...
         "II EMG, time series : ",...
-        name)); % avoids interpreting _ as latex
-    set(tx,'Interpreter','none')
-    
-    subplot(3,1,3)
-    plot(t(10000:30000),Flexors_left_filtered(10000:30000,3));
-    xlabel("time [s]")
-    ylabel('ankle angle [rad]')
-    tx = title(strcat(...
-        "RF EMG, time series : ",...
         name)); % avoids interpreting _ as latex
     set(tx,'Interpreter','none')
     
@@ -681,28 +661,22 @@ s.Extensors_RMG_integral = Extensors_integral_right(4);
 
 %Flexors:
 s.Flexors_LTA_MEAN = Flexors_MEAN_left(1);
-s.Flexors_LIl_MEAN = Flexors_MEAN_left(2);
-s.Flexors_LRF_MEAN = Flexors_MEAN_left(3);
+s.Flexors_LRF_MEAN = Flexors_MEAN_left(2);
 
 s.Flexors_LTA_RMS = Flexors_RMS_left(1);
-s.Flexors_LIl_RMS = Flexors_RMS_left(2);
-s.Flexors_LRF_RMS = Flexors_RMS_left(3);
+s.Flexors_LRF_RMS = Flexors_RMS_left(2);
 
 s.Flexors_LTA_integral = Flexors_integral_left(1);
-s.Flexors_LIl_integral = Flexors_integral_left(2);
-s.Flexors_LRF_integral = Flexors_integral_left(3);
+s.Flexors_LRF_integral = Flexors_integral_left(2);
 
 s.Flexors_RTA_MEAN = Flexors_MEAN_right(1);
-s.Flexors_RIl_MEAN = Flexors_MEAN_right(2);
-s.Flexors_RRF_MEAN = Flexors_MEAN_right(3);
+s.Flexors_RRF_MEAN = Flexors_MEAN_right(2);
 
 s.Flexors_RTA_RMS = Flexors_RMS_right(1);
-s.Flexors_RIl_RMS = Flexors_RMS_right(2);
-s.Flexors_RRF_RMS = Flexors_RMS_right(3);
+s.Flexors_RRF_RMS = Flexors_RMS_right(2);
 
 s.Flexors_RTA_integral = Flexors_integral_right(1);
-s.Flexors_RIl_integral = Flexors_integral_right(2);
-s.Flexors_RRF_integral = Flexors_integral_right(3);
+s.Flexors_RRF_integral = Flexors_integral_right(2);
 
 % Onset and Offset EMG features
 
@@ -760,16 +734,6 @@ s.avg_RTA_Onset_dt = avg_RTA_Onset_dt;
 s.avg_RTA_Offset_dt = avg_RTA_Offset_dt;
 s.var_RTA_Onset_dt = var_RTA_Onset_dt;
 s.var_RTA_Offset_dt = var_RTA_Offset_dt;
-
-s.avg_LIl_Onset_dt = avg_LIl_Onset_dt;
-s.avg_LIl_Offset_dt = avg_LIl_Offset_dt;
-s.var_LIl_Onset_dt = var_LIl_Onset_dt;
-s.var_LIl_Offset_dt = var_LIl_Offset_dt;
-
-s.avg_RIl_Onset_dt = avg_RIl_Onset_dt;
-s.avg_RIl_Offset_dt = avg_RIl_Offset_dt;
-s.var_RIl_Onset_dt = var_RIl_Onset_dt;
-s.var_RIl_Offset_dt = var_RIl_Offset_dt;
 
 s.avg_LRF_Onset_dt = avg_LRF_Onset_dt;
 s.avg_LRF_Offset_dt = avg_LRF_Offset_dt;

@@ -2,16 +2,16 @@
 
 ## Investigated time series
 
-| **Dataset name**         | Species | Condition                             | Context                    |
-| ------------------------ | ------- | ------------------------------------- | -------------------------- |
-| H01_TDM_2kmh.mat         | Human   | Healthy                               | 2kmh walk                  |
-| H01_TDM_35kmh.mat        | Human   | Healthy                               | 3.5kmh walk                |
-| H01_TDM_2kmh_20_incl.mat | Human   | Healthy                               | 2kmh walk on a slope (20°) |
-| DM002_TDM_08_2kmh.mat    | Human   | Spinal Cord Injury, EES treatement    | 2kmh walk                  |
-| DM002_TDM_1kmh_NoEES.mat | Human   | Spinal Cord Injury, no EES treatement | 1kmh walk                  |
-| DM002_TDM_08_1kmh.mat    | Human   | Spinal Cord Injury, treatement        | 1khm walk                  |
-|                          |         |                                       |                            |
-|                          |         |                                       |                            |
+| **Dataset name**     | Species | Condition                             | Context                    |
+| -------------------- | ------- | ------------------------------------- | -------------------------- |
+| H01_TDM_2kmh         | Human   | Healthy                               | 2kmh walk                  |
+| H01_TDM_35kmh        | Human   | Healthy                               | 3.5kmh walk                |
+| H01_TDM_2kmh_20_incl | Human   | Healthy                               | 2kmh walk on a slope (20°) |
+| DM002_TDM_08_2kmh    | Human   | Spinal Cord Injury, EES treatement    | 2kmh walk                  |
+| DM002_TDM_1kmh_NoEES | Human   | Spinal Cord Injury, no EES treatement | 1kmh walk                  |
+| DM002_TDM_08_1kmh    | Human   | Spinal Cord Injury, treatement        | 1khm walk                  |
+|                      |         |                                       |                            |
+|                      |         |                                       |                            |
 
 
 
