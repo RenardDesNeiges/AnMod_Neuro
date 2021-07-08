@@ -6,15 +6,24 @@ addpath(genpath('..'))
 clear 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% | Dataset name .                    | Condition                         | 
+% | Dataset name .                    | Condition                         |
 % | --------------------------------- | --------------------------------- |
-% | Elektra_20190425_TM20_004         | Healthy, 2kmh walk                |
-% | Elektra_20190425_TM30_002         | Healthy, 3kmh walk                |
-% | Elektra_20190425_TM40_005         | Healthy, 4kmh walk                |
+% | Healthy_330_BIP_RW_06             | Healthy                           |
+% | Healthy_330_BIP_RW_07             | Healthy                           |
+% | Healthy_332_BIP_RW_05             | Healthy                           |
+% | Healthy_332_BIP_RW_11             | Healthy                           | 
+% | SCI_Trained_207_RW_STIM_25_04     | Spinal Cord Injury, with EES      |
+% | SCI_Trained_207_RW_STIM_25_07     | Spinal Cord Injury, with EES      |
+% | SCI_Trained_207_RW_STIM_35_02     | Spinal Cord Injury, with EES      |
+% | SCI_Trained_207_RW_STIM_BWS40_10  | Spinal Cord Injury, with EES      |
+% | SCI_trained_207_RW_SPONT_30_08    | Spinal Cord Injury, without EES   |
+% | SCI_trained_207_RW_SPONT_30_10    | Spinal Cord Injury, without EES   |
+% | SCI_trained_207_RW_SPONT_BWS40_03 | Spinal Cord Injury, without EES   |
+% | SCI_trained_207_RW_SPONT_BWS45_05 | Spinal Cord Injury, without EES   |
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %change the time series name here to get features from another dataset
-name = 'Elektra_20190425_TM20_004'; 
+name = 'SCI_trained_207_RW_SPONT_BWS45_05'; 
 
 load(strcat(name,'.mat')) % load the dataset 
 velocity = 2; %velocity in km/h
@@ -27,29 +36,22 @@ set(0,'DefaultFigureWindowStyle','docked')
 clc
 close all
 
-marker_sr = Kinematic.sampFq;
-emg_sr = EMG.sampFq;
+marker_sr = 200;
+emg_sr = 2000;
 
 % Right:
-% to check that this is the right part of the dataset just run Kinematic.KINnames(20:22);
-hip_r = Kinematic.data(1000:6000,20:22); 
-hip_r = fillmissing(hip_r,'previous');          %get rid of NaN values
-knee_r = Kinematic.data(1000:6000,23:25);
-knee_r = fillmissing(knee_r,'previous');
-ankle_r = Kinematic.data(1000:6000,26:28);
-ankle_r = fillmissing(ankle_r,'previous');
-toe_r = Kinematic.data(1000:6000,29:31);
-toe_r = fillmissing(toe_r,'previous');
+hip_r = data.RHip;
+knee_r = data.RKnee;
+ankle_r = data.RAnkle;
+toe_r = data.RMTP;
 
 % Left:
-hip_l = Kinematic.data(1000:6000,5:7);
-hip_l = fillmissing(hip_l,'previous');
-knee_l = Kinematic.data(1000:6000,8:10);
-knee_l = fillmissing(knee_l,'previous');
-ankle_l = Kinematic.data(1000:6000,11:13);
-ankle_l = fillmissing(ankle_l,'previous');
-toe_l = Kinematic.data(1000:6000,14:16);
-toe_l = fillmissing(toe_l,'previous');
+
+hip_l = data.LHip;
+knee_l = data.LKnee;
+ankle_l = data.LAnkle;
+toe_l = data.LMTP;
+
 
 
 
@@ -57,10 +59,11 @@ toe_l = fillmissing(toe_l,'previous');
 % empirical mean and variance estimates of cycle time 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
 [cycle_r,cycle_index_r,cycle_time_r] = ...
-    get_cycle(ankle_r(:,2),hip_r(:,2),marker_sr,7);
+    get_cycle(ankle_r(:,2),hip_r(:,2),marker_sr,10);
 [cycle_l,cycle_index_l,cycle_time_l] = ...
-    get_cycle(ankle_l(:,2),hip_l(:,2),marker_sr,7);
+    get_cycle(ankle_l(:,2),hip_l(:,2),marker_sr,10);
 
 avg_cycle_time = mean([cycle_time_r,cycle_time_l]);
 var_cycle_time = var([cycle_time_r,cycle_time_l]-avg_cycle_time);
@@ -72,11 +75,11 @@ if show_plots == true
     normalized_y_ankle_speed = diff(normalized_y_ankle);
     
     set(gcf,'color','w');
-    times = (1/marker_sr) * (1:1:1000);
+    times = (1/marker_sr) * (1:size(normalized_y_ankle,1));
     hold on
-	plot((0:1:1000)*(1/marker_sr),normalized_y_ankle(500:1500));
-    if size(cycle_r( (cycle_r < 15) & (cycle_r > 5) )) > 0
-        plot(cycle_r( (cycle_r < 15) & (cycle_r > 5) ) - 5,0,'or');
+	plot(times,normalized_y_ankle(1:size(normalized_y_ankle,1))');
+    if size(cycle_r) > 0
+        plot(cycle_r,0,'or');
     end
     xlabel("time [s]")
     ylabel('normalized ankle position (ankle-hip dist) [m]')
@@ -123,17 +126,11 @@ if show_plots == true
     figure
     % plotting stance - swing segmentation
     set(gcf,'color','w');
-    times = (1/marker_sr) * (1:1:1000);
-	plot(times,pitch_foot_angle_r(501:1500)');
+    times = (1/marker_sr) * (1:size(normalized_y_ankle,1));
+	plot(times,pitch_foot_angle_r()');
     hold on
-	plot(stance_starts_r(( ...
-        stance_starts_r<1500*(1/marker_sr)) & ...
-        (stance_starts_r>500*(1/marker_sr))) - ...
-        500/marker_sr,-0.1,'or');
-    plot(swing_starts_r(( ...
-        swing_starts_r<1500*(1/marker_sr)) & ...
-        (swing_starts_r>500*(1/marker_sr))) - ...
-        500/marker_sr,-1,'ob');
+	plot(stance_starts_r,0.4,'or');
+    plot(swing_starts_r ,-1.5,'ob');
     xlabel("time [s]")
     ylabel('pitch angle [rad]')
     t = title(strcat(...
@@ -152,7 +149,7 @@ var_stance_proportion = var([swing_stange_seg_r,swing_stange_seg_l]-...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-h_threshold = 0;
+h_threshold = 10;
 
 [max_height_r,max_height_times_r,max_height_indices_r] = ...
     max_heights(ankle_r(:,3),h_threshold,marker_sr);
@@ -167,12 +164,12 @@ height_disymmetry = abs((mean(max_height_r)-mean(max_height_l))/...
 
 if show_plots == true
     figure
-    ankle_height = ankle_r(501:1500,3);
+    ankle_height = ankle_r(:,3);
     [max_height,max_times,max_indices] = ...
         max_heights(ankle_height,h_threshold,marker_sr);
     % plotting stance - swing segmentation
     set(gcf,'color','w');
-    times = (1/marker_sr) * (1:1:1000);
+    times = (1/marker_sr) * (1:size(normalized_y_ankle,1));
 	plot(times,ankle_height')
     hold on
     plot(max_indices * (1/marker_sr),max_height,'or')
@@ -184,7 +181,6 @@ if show_plots == true
         name)); % avoids interpreting _ as latex
     set(t,'Interpreter','none')
 end
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -203,11 +199,11 @@ knee_amp_asymetry = abs((knee_amplitude_l-knee_amplitude_r)/...
 
 if show_plots == true
     figure
-    [angular_velocity,angle] = knee_pitch_vel(hip_l(501:1500,:),...
-        knee_l(501:1500,:),ankle_l(501:1500,:));
+    [angular_velocity,angle] = knee_pitch_vel(hip_l(:,:),...
+        knee_l(:,:),ankle_l(:,:));
     % plotting stance - swing segmentation
     set(gcf,'color','w');
-    times = (1/marker_sr) * (1:1:1000);
+    times = (1/marker_sr) * (1:size(normalized_y_ankle,1));
 	plot(times,angle)
     hold on
     xlabel("time [s]")
@@ -232,10 +228,10 @@ hip_amp_asymetry = abs((hip_amplitude_l-hip_amplitude_r)/...
                             
 if show_plots == true
     figure
-    [~,angle] = hip_angle_vel(hip_l(501:1500,:),knee_l(501:1500,:));
+    [~,angle] = hip_angle_vel(hip_l(:,:),knee_l(:,:));
     % plotting stance - swing segmentation
     set(gcf,'color','w');
-    times = (1/marker_sr) * (1:1:1000);
+    times = (1/marker_sr) * (1:size(normalized_y_ankle,1));
 	plot(times,angle)
     hold on
     xlabel("time [s]")
@@ -263,11 +259,11 @@ ankle_amp_asymetry = abs((ankle_amplitude_l-ankle_amplitude_r)/...
 if show_plots == true
     figure
     [~,angle] = ...
-        ankle_pitch_vel(knee_l(501:1500,:),ankle_l(501:1500,:),...
-        toe_l(501:1500,:));
+        ankle_pitch_vel(knee_l(:,:),ankle_l(:,:),...
+        toe_l(:,:));
     % plotting stance - swing segmentation
     set(gcf,'color','w');
-    times = (1/marker_sr) * (1:1:1000);
+    times = (1/marker_sr) * (1:size(normalized_y_ankle,1));
 	plot(times,angle)
     hold on
     xlabel("time [s]")
