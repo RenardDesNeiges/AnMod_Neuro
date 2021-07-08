@@ -8,7 +8,7 @@ function [max_height,max_times,max_indices] = max_heights(ankle_height,threshold
 %   - maxs_height a vector containing the max height for each max
 %   - max_times a vector containing time of each maximum
 %   - max_indices a vector containing the indices of each maximum
-    
+
     % take derivative
     ankle_speed = diff(ankle_height);
     
@@ -20,7 +20,8 @@ function [max_height,max_times,max_indices] = max_heights(ankle_height,threshold
     % find zero-crossings of the filtered derivative
     zci = @(v) find(v(:).*circshift(v(:), [-1 0]) <= 0);
     raw_zero_indices_speed = zci(ankle_speed_flt);
-    height_when_diff_0 = ankle_height(raw_zero_indices_speed);
+    height_when_diff_0 = ankle_height(raw_zero_indices_speed)-...
+        mean(ankle_height);
     
     % only consider high enough values
     max_indices = raw_zero_indices_speed(height_when_diff_0 > threshold);

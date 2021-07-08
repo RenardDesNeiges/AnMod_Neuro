@@ -31,7 +31,7 @@ function [stance_starts_indices,swing_starts_indices,swing_stance_seg] = ...
 
 
      for i = 1:1:size(maxs,1)
-        if maxs(i)-prev_indice > 100
+        if maxs(i)-prev_indice > 50
            stance_starts_indices = [stance_starts_indices,maxs(i)];
         end
         prev_indice = maxs(i);
@@ -39,7 +39,7 @@ function [stance_starts_indices,swing_starts_indices,swing_stance_seg] = ...
 
      prev_indice = -1000;
      for i = 1:1:size(mins,1)
-        if mins(i)-prev_indice > 100
+        if mins(i)-prev_indice > 50
            swing_starts_indices = [swing_starts_indices,mins(i)];
         end
         prev_indice = mins(i);

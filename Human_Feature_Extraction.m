@@ -4,7 +4,10 @@
 addpath(genpath('..'))
 
 clear 
-name = 'H01_TDM_2kmh';
+
+%change the file name here to get features from another dataset
+name = 'H01_TDM_2kmh'; 
+
 load(strcat(name,'.mat')) % load the dataset 
 velocity = 2; %velocity in km/h
 s = struct; %feature structure
@@ -123,10 +126,12 @@ var_stance_proportion = var([swing_stange_seg_r,swing_stange_seg_l]-...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+h_threshold = 0;
+
 [max_height_r,max_height_times_r,max_height_indices_r] = ...
-    max_heights(ankle_r(:,3),350,marker_sr);
+    max_heights(ankle_r(:,3),h_threshold,marker_sr);
 [max_height_l,max_height_times_l,max_height_indices_l] = ...
-    max_heights(ankle_l(:,3),350,marker_sr);
+    max_heights(ankle_l(:,3),h_threshold,marker_sr);
 
 % getting stance times
 avg_step_height = mean([max_height_r;max_height_l]);
@@ -138,7 +143,7 @@ if show_plots == true
     figure
     ankle_height = ankle_r(501:1500,3);
     [max_height,max_times,max_indices] = ...
-        max_heights(ankle_height,350,marker_sr);
+        max_heights(ankle_height,h_threshold,marker_sr);
     % plotting stance - swing segmentation
     set(gcf,'color','w');
     times = (1/marker_sr) * (1:1:1000);
@@ -521,10 +526,10 @@ var_LRF_Offset_dt = var(Flexors_LRF_Offset_dt);
     onset_offset_extraction(Flexors_right_filtered(:,3), delta_time, ...
     swing_starts_indices_r, stance_starts_indices_r,emg_sr);
 
-avg_LRF_Onset_dt = mean(Flexors_LRF_Onset_dt);
-avg_LRF_Offset_dt = mean(Flexors_LRF_Offset_dt);
-var_LRF_Onset_dt = var(Flexors_LRF_Onset_dt);
-var_LRF_Offset_dt = var(Flexors_LRF_Offset_dt);
+avg_RRF_Onset_dt = mean(Flexors_LRF_Onset_dt);
+avg_RRF_Offset_dt = mean(Flexors_LRF_Offset_dt);
+var_RRF_Onset_dt = var(Flexors_LRF_Onset_dt);
+var_RRF_Offset_dt = var(Flexors_LRF_Offset_dt);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Filtered muscle EMG plots with offset/onset detections
@@ -615,7 +620,7 @@ s.var_cycle_time = var_cycle_time;                  % in seconds        2
 s.velocity = velocity/3.6;                          % in meter/second   3
 s.avg_stance_proportion = avg_stance_proportion;    % unitless          4
 s.var_stance_proportion = var_stance_proportion;    % unitless          5
-s.avg_step_height = avg_step_height;                % in mm             6
+s.avg_step_t = avg_step_height;                % in mm             6
 s.var_step_height = var_step_height;                % in mm             7
 s.height_disymmetry = height_disymmetry;            % unitless          8
 s.foot_amplitude_l = foot_amplitude_l;              % in radients       9
