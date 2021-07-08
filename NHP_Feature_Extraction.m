@@ -310,11 +310,23 @@ end
 %%
 emg_sr = EMG.sampFq;
 
+
+R_Glut = EMG.data(1,:);
+R_Il = EMG.data(2,:);
+R_RF = EMG.data(3,:);
+R_ST = EMG.data(4,:);
+R_MG = EMG.data(5,:);
+R_TA = EMG.data(6,:);
+R_EDL = EMG.data(7,:);
+R_FHL = EMG.data(8,:);
+
+
 tmin = 0;
-tmax = size(data.RTA,1)/emg_sr;
+tmax = size(R_TA,1)/emg_sr;
 t = linspace(tmin,tmax,242900);
 delta_time = 1200.0 ;
 
+%%
 Flexors_left = [data.LTA, data.LRF];
 Flexors_right = [data.RTA, data.RRF];
 Extensors_left = [data.LSol, data.LST, data.LVLat, data.LMG];

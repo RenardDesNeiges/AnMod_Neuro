@@ -23,7 +23,7 @@ clear
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %change the time series name here to get features from another dataset
-name = 'SCI_trained_207_RW_SPONT_BWS45_05'; 
+name = 'Healthy_330_BIP_RW_06'; 
 
 load(strcat(name,'.mat')) % load the dataset 
 velocity = 2; %velocity in km/h
