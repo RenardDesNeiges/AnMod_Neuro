@@ -5,13 +5,15 @@ function [onset_id,offset_id,onset_t,offset_t,onset_dt,offset_dt] = ...
 %   Parameters
 %       - EMG : EMG time series
 %       - delta_t : expected burst length
-    
-    mean_swing = mean(EMG(start_swing:start_stance,1));
-    sd_swing = std(EMG(start_swing:start_stance,1));
+    start_swing = start_swing*10;
+    start_stance = start_stance*10;
+    mean_swing = mean(EMG(:,1))*0.3;
+    sd_swing = std(EMG(:,1));
     threshold = mean_swing+2*sd_swing;
     onset_id = [];
     offset_id = [];
-    
+
+
     for i=1:length(EMG)-1
         if (EMG(i,1)<=threshold & EMG(i+1,1) >= threshold)
             if(isempty(onset_id))
@@ -28,10 +30,10 @@ function [onset_id,offset_id,onset_t,offset_t,onset_dt,offset_dt] = ...
             end
         end
     end
-    
+
     onset_t = onset_id * (1/sr);
     offset_t = offset_id * (1/sr);
-    
+
     onset_dt = diff(onset_t);
     offset_dt = diff(offset_t);
 end

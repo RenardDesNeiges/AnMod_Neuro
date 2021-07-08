@@ -23,7 +23,7 @@ clear
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %change the time series name here to get features from another dataset
-name = 'Healthy_330_BIP_RW_06'; 
+name = 'Healthy_330_BIP_RW_07'; 
 
 load(strcat(name,'.mat')) % load the dataset 
 velocity = 2; %velocity in km/h
@@ -303,42 +303,53 @@ end
 % extensor : sol, ST , VLAT,MG
 % flexor : TA ,II, RF
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%
-emg_sr = EMG.sampFq;
 
 tmin = 0;
-tmax = size(data.RTA,1)/emg_sr;
+tmax = size(data.TA,1)/emg_sr;
 t = linspace(tmin,tmax,242900);
 delta_time = 1200.0 ;
 
-Flexors_left = [data.LTA, data.LRF];
-Flexors_right = [data.RTA, data.RRF];
-Extensors_left = [data.LSol, data.LST, data.LVLat, data.LMG];
-Extensors_right = [data.RSol, data.RST, data.RVLat, data.RMG];
+Flexors_left = [data.TA, data.RF, data.VL];
+Extensors_left = [ data.ST, data.MG];
 
 [~,c_F]=size(Flexors_left);
 Flexors_left_filtered = [];
-Flexors_right_filtered = [];
 
 for i=1:c_F
     inter_l = Filter_EMG(Flexors_left(:,i),emg_sr);
     Flexors_left_filtered= [Flexors_left_filtered, inter_l];
-    inter_r = Filter_EMG(Flexors_right(:,i),emg_sr);
-    Flexors_right_filtered= [Flexors_right_filtered, inter_r];
 end
 
 
 [~,c_E]=size(Extensors_left);
 Extensors_left_filtered = [];
-Extensors_right_filtered = [];
 
 for i=1:c_E
     inter_l = Filter_EMG(Extensors_left(:,i),emg_sr);
     Extensors_left_filtered= [Extensors_left_filtered, inter_l];
-    inter_r = Filter_EMG(Extensors_right(:,i),emg_sr);
-    
-    Extensors_right_filtered= [Extensors_right_filtered, inter_r];
 end
+
+if  show_plots
+    figure
+    times = (1:size(Extensors_left_filtered,1))*(1/emg_sr)
+    for i=1:size(Extensors_left_filtered,2)
+        subplot(size(Extensors_left_filtered,2),1,i)
+        plot(times,Extensors_left_filtered(:,i))
+    end
+    set(gcf,'color','w');
+    sgtitle("Extensors EMG")
+    
+    figure
+    times = (1:size(Flexors_left_filtered,1))*(1/emg_sr)
+    for i=1:size(Flexors_left_filtered,2)
+        subplot(size(Flexors_left_filtered,2),1,i)
+        plot(times,Flexors_left_filtered(:,i))
+    end
+    set(gcf,'color','w');
+    sgtitle("Flexor EMG")
+    
+end
+
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % muscle activity params extraction
