@@ -777,7 +777,20 @@ s.avg_LRF_Offset_dt = avg_LRF_Offset_dt;
 s.var_LRF_Onset_dt = var_LRF_Onset_dt;
 s.var_LRF_Offset_dt = var_LRF_Offset_dt;
 
+if show_plots
+    figure
+    feature_vec = cell2mat(struct2cell(s));
+    bar(log(feature_vec))
+    tx = title(strcat(...
+        "log scale feature vector, time series : ",...
+        name)); % avoids interpreting _ as latex
+    set(tx,'Interpreter','none')
+    set(gcf,'color','w');
+end
 
-%% exporting the data to a file
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% exporting the data to a file
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 save(strcat('./features/',name,'_features.mat'),'s')
+
