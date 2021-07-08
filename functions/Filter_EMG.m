@@ -3,7 +3,7 @@ function [filtered_EMG] = Filter_EMG(EMG,sr)
 %   Detailed explanation goes here
 % Step 1 - Slightly filter (band pass 10-2000 Hz) --> avec notre sampling
 % frequency on peut aller jusqu'à 1000
-Band  = [10/(sr), 999/(sr)]
+Band  = [10/(sr), 999/(sr)];
 [b1, a1] = butter(2, Band, 'Bandpass');   
 signal_step1 = filter(b1, a1, EMG);
 

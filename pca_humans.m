@@ -23,12 +23,15 @@ set(0,'DefaultFigureWindowStyle','docked')
 
 show_plots = true; %set to true to display results
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %dataset names
 datasets  = [   "H01_TDM_2kmh",...
                 "H01_TDM_35kmh",...
                 "H01_TDM_2kmh_20_incl",...
                 "DM002_TDM_08_2kmh",...
                 "DM002_TDM_08_1kmh"];
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 data = [];
 if show_plots == true
@@ -55,16 +58,28 @@ if show_plots
     sgtitle('Feature vectors for human time series')       
 end
 
+% names of the different variables in the feature vector
+struct = load(strcat("features/",datasets(1),"_features.mat")).s;
+field_names = fieldnames(struct);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Running PCA on the data
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-X = zscore(data);
+X = zscore(data');
 
+[coefs,score] = pca(X);
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Plotting Standardized Feature Vector
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if show_plots == true
     figure
 end
 for i = 1:1:size(datasets,2)
-    vec = X(:,i);
+    vec = X(i,:);
     if show_plots == true
         subplot(size(datasets,2),1,i)
         bar(vec)
@@ -79,10 +94,30 @@ if show_plots
     sgtitle('Standardized feature vectors for human time series')       
 end
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Biplots
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-[coefs,score] = pca(X);
+
 if show_plots == true
+    % first 3 eigenvectors
     figure
-    biplot(coefs(:,1:3),'Scores',score(:,1:3),'VarLabels',datasets);
+    biplot(coefs(:,1:2),'Scores',score(:,1:2),'ObsLabels',datasets);
     set(gcf,'color','w');
+    
+    figure
+    biplot(coefs(:,2:3),'Scores',score(:,2:3),'ObsLabels',datasets);
+    set(gcf,'color','w');
+    
+    figure
+    biplot(coefs(:,3:4),'Scores',score(:,3:4),'ObsLabels',datasets);
+    set(gcf,'color','w');
+    
+    figure
+    for i = 1:3
+        subplot(1,3,i)
+        barh(score(:,i))
+    end
+    
+    
 end

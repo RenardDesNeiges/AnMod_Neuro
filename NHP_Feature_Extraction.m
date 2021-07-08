@@ -1,4 +1,4 @@
-%% Script for the feature extraction from human patient time series
+%% Script for the feature extraction from non-human primate time series
 
 %clear workspace, load the data
 addpath(genpath('..'))
@@ -6,18 +6,15 @@ addpath(genpath('..'))
 clear 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% | Dataset name         | Species | Condition                            |
-% | -------------------- | ------- | -------------------------------------|
-% | H01_TDM_2kmh         | Human   | Healthy, 2kmh walk                   |
-% | H01_TDM_35kmh        | Human   | Healthy, 3.5kmh walk                 |
-% | H01_TDM_2kmh_20_incl | Human   | Healthy, 2kmh walk on a slope (20°)  |
-% | DM002_TDM_08_2kmh    | Human   | SCI, EES treatement, 2kmh walk       |
-% | DM002_TDM_08_1kmh    | Human   | SCI, EES treatement, 1khm walk       |
-% | DM002_TDM_1kmh_NoEES | Human   | SCI, no EES treatement, 1kmh walk    |
+% | Dataset name .                    | Condition                         | 
+% | --------------------------------- | --------------------------------- |
+% | Elektra_20190425_TM20_004         | Healthy, 2kmh walk                |
+% | Elektra_20190425_TM30_002         | Healthy, 3kmh walk                |
+% | Elektra_20190425_TM40_005         | Healthy, 4kmh walk                |
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %change the time series name here to get features from another dataset
-name = 'H01_TDM_35kmh'; 
+name = 'Elektra_20190425_TM20_004'; 
 
 load(strcat(name,'.mat')) % load the dataset 
 velocity = 2; %velocity in km/h
@@ -30,20 +27,31 @@ set(0,'DefaultFigureWindowStyle','docked')
 clc
 close all
 
-marker_sr = data.marker_sr;
-emg_sr = data.EMG_sr;
+marker_sr = Kinematic.sampFq;
+emg_sr = EMG.sampFq;
 
 % Right:
-hip_r = data.RHIP;
-knee_r = data.RKNE;
-ankle_r = data.RANK;
-toe_r = data.RTOE;
+% to check that this is the right part of the dataset just run Kinematic.KINnames(20:22);
+hip_r = Kinematic.data(1000:6000,20:22); 
+hip_r = fillmissing(hip_r,'previous');          %get rid of NaN values
+knee_r = Kinematic.data(1000:6000,23:25);
+knee_r = fillmissing(knee_r,'previous');
+ankle_r = Kinematic.data(1000:6000,26:28);
+ankle_r = fillmissing(ankle_r,'previous');
+toe_r = Kinematic.data(1000:6000,29:31);
+toe_r = fillmissing(toe_r,'previous');
 
 % Left:
-hip_l = data.LHIP;
-knee_l = data.LKNE;
-ankle_l = data.LANK;
-toe_l = data.LTOE;
+hip_l = Kinematic.data(1000:6000,5:7);
+hip_l = fillmissing(hip_l,'previous');
+knee_l = Kinematic.data(1000:6000,8:10);
+knee_l = fillmissing(knee_l,'previous');
+ankle_l = Kinematic.data(1000:6000,11:13);
+ankle_l = fillmissing(ankle_l,'previous');
+toe_l = Kinematic.data(1000:6000,14:16);
+toe_l = fillmissing(toe_l,'previous');
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % empirical mean and variance estimates of cycle time 
@@ -67,7 +75,9 @@ if show_plots == true
     times = (1/marker_sr) * (1:1:1000);
     hold on
 	plot((0:1:1000)*(1/marker_sr),normalized_y_ankle(500:1500));
-    plot(cycle_r( (cycle_r < 15) & (cycle_r > 5) ) - 5,-0.1,'or');
+    if size(cycle_r( (cycle_r < 15) & (cycle_r > 5) )) > 0
+        plot(cycle_r( (cycle_r < 15) & (cycle_r > 5) ) - 5,0,'or');
+    end
     xlabel("time [s]")
     ylabel('normalized ankle position (ankle-hip dist) [m]')
     t = title(strcat("cycle start detection for dataset : ", ...
@@ -75,9 +85,14 @@ if show_plots == true
     set(t,'Interpreter','none')
 end
 
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % swing - stance phase segmentation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
 
 [stance_starts_indices_r,swing_starts_indices_r,swing_stange_seg_r] = ...
         swing_stance(toe_r(:,2),ankle_r(:,2),toe_r(:,3),ankle_r(:,3));
@@ -169,6 +184,8 @@ if show_plots == true
         name)); % avoids interpreting _ as latex
     set(t,'Interpreter','none')
 end
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % amplitude of oscillation for knee joint
@@ -291,7 +308,7 @@ end
 % flexor : TA ,II, RF
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-emg_sr = data.EMG_sr;
+emg_sr = EMG.sampFq;
 
 tmin = 0;
 tmax = size(data.RTA,1)/emg_sr;
@@ -326,7 +343,7 @@ for i=1:c_E
     
     Extensors_right_filtered= [Extensors_right_filtered, inter_r];
 end
-
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % muscle activity params extraction
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
