@@ -10,8 +10,8 @@ clear
 % | --------------------------------- | --------------------------------- |
 % | Healthy_330_BIP_RW_06             | Healthy                           |
 % | Healthy_330_BIP_RW_07             | Healthy                           |
-% | Healthy_332_BIP_RW_05             | Healthy                           |
-% | Healthy_332_BIP_RW_11             | Healthy                           | 
+% | Healthy_332_BIP_RW_05             | Healthy but naze                  |
+% | Healthy_332_BIP_RW_11             | Healthy, encore pire              | 
 % | SCI_Trained_207_RW_STIM_25_04     | Spinal Cord Injury, with EES      |
 % | SCI_Trained_207_RW_STIM_25_07     | Spinal Cord Injury, with EES      |
 % | SCI_Trained_207_RW_STIM_35_02     | Spinal Cord Injury, with EES      |
@@ -23,9 +23,9 @@ clear
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %change the time series name here to get features from another dataset
-name = 'Healthy_330_BIP_RW_07'; 
+name = 'SCI_trained_207_RW_SPONT_30_08'; 
 
-load(strcat(name,'.mat')) % load the dataset 
+load(strcat(name,'.mat')); % load the dataset 
 velocity = 2; %velocity in km/h
 s = struct; %feature structure
 show_plots = true; %set to true to display results
@@ -52,6 +52,9 @@ knee_l = data.LKnee;
 ankle_l = data.LAnkle;
 toe_l = data.LMTP;
 
+if isfield(data, 'RTA')
+    data.TA = data.RTA;
+end
 
 
 

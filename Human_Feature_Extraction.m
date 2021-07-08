@@ -267,7 +267,7 @@ end
 
 [ankle_knee_angle_corr,ankle_knee_angle_asymetry] = ...
     correlate_leg_signals(ankle_angle_l,ankle_angle_r, ...
-    knee_angle_l,knee_angle_r);
+    knee_angle_l,knee_angle_r)
 
 [ankle_foot_angle_corr,ankle_foot_angle_asymetry] = ...
     correlate_leg_signals(ankle_angle_l,ankle_angle_r, ...
@@ -298,8 +298,8 @@ tmax = size(data.RTA,1)/emg_sr;
 t = linspace(tmin,tmax,242900);
 delta_time = 1200.0 ;
 
-Flexors_left = [data.LTA, data.LRF];
-Extensors_left = [data.LVLat, data.LMG];
+Flexors_left = [data.LTA];
+Extensors_left = [data.LMG];
 
 [~,c_F]=size(Flexors_left);
 Flexors_left_filtered = [];
@@ -362,21 +362,10 @@ end
 
 %Extensors:
 
-[Extensors_LVlat_Onset_id,Extensors_LVlat_Offset_id,...
-    Extensors_LVlat_Onset_t,Extensors_LVlat_Offset_t,...
-    Extensors_LVlat_Onset_dt,Extensors_LVlat_Offset_dt]= ...
-    onset_offset_extraction(Extensors_left_filtered(:,1), delta_time, ...
-    swing_starts_indices_l,stance_starts_indices_l, emg_sr);
-
-avg_LVlat_Onset_dt = mean(Extensors_LVlat_Onset_dt);
-avg_LVlat_Offset_dt = mean(Extensors_LVlat_Offset_dt);
-var_LVlat_Onset_dt = var(Extensors_LVlat_Onset_dt);
-var_LVlat_Offset_dt = var(Extensors_LVlat_Offset_dt);
-
 [Extensors_LMG_Onset_id,Extensors_LMG_Offset_id,...
     Extensors_LMG_Onset_t,Extensors_LMG_Offset_t,...
     Extensors_LMG_Onset_dt,Extensors_LMG_Offset_dt]= ...
-    onset_offset_extraction(Extensors_left_filtered(:,2), delta_time, ...
+    onset_offset_extraction(Extensors_left_filtered(:,1), delta_time, ...
     swing_starts_indices_l, stance_starts_indices_l, emg_sr);
 
 avg_LMG_Onset_dt = mean(Extensors_LMG_Onset_dt);
@@ -397,18 +386,6 @@ avg_LTA_Offset_dt = mean(Flexors_LTA_Offset_dt);
 var_LTA_Onset_dt = var(Flexors_LTA_Onset_dt);
 var_LTA_Offset_dt = var(Flexors_LTA_Offset_dt);
 
-[Flexors_LRF_Onset_id,Flexors_LRF_Offset_id,...
-    Flexors_LRF_Onset_t,Flexors_LRF_Offset_t,...
-    Flexors_LRF_Onset_dt,Flexors_LRF_Offset_dt]= ...
-    onset_offset_extraction(Flexors_left_filtered(:,2), delta_time, ...
-    swing_starts_indices_l,stance_starts_indices_l, emg_sr);
-
-avg_LRF_Onset_dt = mean(Flexors_LRF_Onset_dt);
-avg_LRF_Offset_dt = mean(Flexors_LRF_Offset_dt);
-var_LRF_Onset_dt = var(Flexors_LRF_Onset_dt);
-var_LRF_Offset_dt = var(Flexors_LRF_Offset_dt);
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Filtered muscle EMG plots with offset/onset detections
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -418,7 +395,7 @@ if show_plots
     figure
     set(gcf,'color','w');
     
-    subplot(2,1,1)
+    subplot(1,1,1)
     plot(t(10000:30000),Flexors_left_filtered(10000:30000,1));
     hold on
     plot(Flexors_LTA_Onset_t((Flexors_LTA_Onset_t > t(10000)) &  (Flexors_LTA_Onset_t < t(30000))),.02,'or')
@@ -430,35 +407,10 @@ if show_plots
         name)); % avoids interpreting _ as latex
     set(tx,'Interpreter','none')
     
-    subplot(2,1,2)
-    plot(t(10000:30000),Flexors_left_filtered(10000:30000,2));
-    hold on
-    plot(Flexors_LRF_Onset_t((Flexors_LRF_Onset_t > t(10000)) &  (Flexors_LRF_Onset_t < t(30000))),.02,'or')
-    plot(Flexors_LRF_Offset_t((Flexors_LRF_Offset_t > t(10000)) &  (Flexors_LRF_Offset_t< t(30000))),.02,'ob')
-    xlabel("time [s]")
-    ylabel('ankle angle [rad]')
-    tx = title(strcat(...
-        "II EMG, time series : ",...
-        name)); % avoids interpreting _ as latex
-    set(tx,'Interpreter','none')
-    
     figure
    
-    subplot(2,1,1)
+    subplot(1,1,1)
     plot (t(10000:30000),Extensors_left_filtered(10000:30000,1));
-    hold on
-    plot(Extensors_LVlat_Onset_t((Extensors_LVlat_Onset_t > t(10000)) &  (Extensors_LVlat_Onset_t < t(30000))),.02,'or')
-    plot(Extensors_LVlat_Offset_t((Extensors_LVlat_Offset_t > t(10000)) &  (Extensors_LVlat_Offset_t< t(30000))),.02,'ob')
-    
-    xlabel("time [s]")
-    ylabel('activity [mV]')
-    tx = title(strcat(...
-        "VLAT EMG, time series : ",...
-        name)); % avoids interpreting _ as latex
-    set(tx,'Interpreter','none')
-    
-    subplot(2,1,2)
-    plot (t(10000:30000),Extensors_left_filtered(10000:30000,2));
     hold on
     plot(Extensors_LMG_Onset_t((Extensors_LMG_Onset_t > t(10000)) &  (Extensors_LMG_Onset_t < t(30000))),.02,'or')
     plot(Extensors_LMG_Offset_t((Extensors_LMG_Offset_t > t(10000)) &  (Extensors_LMG_Offset_t< t(30000))),.02,'ob')
@@ -510,33 +462,18 @@ s.hip_knee_angle_asymetry = hip_knee_angle_asymetry;% unitless          27
 
 % EMG features
 %Extensors:
-s.Extensors_LVlat_MEAN = Extensors_MEAN_left(1);
-s.Extensors_LMG_MEAN = Extensors_MEAN_left(2);
-
-s.Extensors_LVlat_RMS = Extensors_RMS_left(1);
-s.Extensors_LMG_RMS = Extensors_RMS_left(2);
-
-s.Extensors_LVlat_integral = Extensors_integral_left(1);
-s.Extensors_LMG_integral = Extensors_integral_left(2);
+s.Extensors_LMG_MEAN = Extensors_MEAN_left(1);
+s.Extensors_LMG_RMS = Extensors_RMS_left(1);
+s.Extensors_LMG_integral = Extensors_integral_left(1);
 
 %Flexors:
 s.Flexors_LTA_MEAN = Flexors_MEAN_left(1);
-s.Flexors_LRF_MEAN = Flexors_MEAN_left(2);
-
 s.Flexors_LTA_RMS = Flexors_RMS_left(1);
-s.Flexors_LRF_RMS = Flexors_RMS_left(2);
-
 s.Flexors_LTA_integral = Flexors_integral_left(1);
-s.Flexors_LRF_integral = Flexors_integral_left(2);
 
 % Onset and Offset EMG features
 
 % Flexors:
-
-s.avg_LVlat_Onset_dt = avg_LVlat_Onset_dt;
-s.avg_LVlat_Offset_dt = avg_LVlat_Offset_dt;
-s.var_LVlat_Onset_dt = var_LVlat_Onset_dt;
-s.var_LVlat_Offset_dt = var_LVlat_Offset_dt;
 
 s.avg_LMG_Onset_dt = avg_LMG_Onset_dt;
 s.avg_LMG_Offset_dt = avg_LMG_Offset_dt;
@@ -549,16 +486,6 @@ s.avg_LTA_Onset_dt = avg_LTA_Onset_dt;
 s.avg_LTA_Offset_dt = avg_LTA_Offset_dt;
 s.var_LTA_Onset_dt = var_LTA_Onset_dt;
 s.var_LTA_Offset_dt = var_LTA_Offset_dt;
-
-s.avg_LRF_Onset_dt = avg_LRF_Onset_dt;
-s.avg_LRF_Offset_dt = avg_LRF_Offset_dt;
-s.var_LRF_Onset_dt = var_LRF_Onset_dt;
-s.var_LRF_Offset_dt = var_LRF_Offset_dt;
-
-s.avg_LRF_Onset_dt = avg_LRF_Onset_dt;
-s.avg_LRF_Offset_dt = avg_LRF_Offset_dt;
-s.var_LRF_Onset_dt = var_LRF_Onset_dt;
-s.var_LRF_Offset_dt = var_LRF_Offset_dt;
 
 if show_plots
     figure
