@@ -1,5 +1,16 @@
 # Analysis and modelling of Locomotion Homework 3 : PCA analysis of motion-capture and EMG gait parameters
 
+## Data processing pipeline
+
+To run the data processing pipeline proceed as follow : 
+
+1. The submitted code does not contain the datasets, place the src file in the same folder as the dataset in order to correctly import the data
+2. There are three different scripts for the 3 different species, each script can be made to process all of the datasets from a given species. To select a dataset, set the *name* variable to the dataset to analyze, the list of available names is presented as a comment in the header of each script. The script can be made to plot results by setting the show_plot boolean to **true**. The resulting feature vector is automatically saved in the **features** folder and can in turn be loaded by the PCA script. The scripts files for the different species are the following :
+   1. *Human_Feature_Extraction.m* processes the human datasets
+   2. *NHP_Feature_Extraction.m* processes the non-human primates datasets
+   3. *Rodent_Feature_Extraction.m* processes the rodent datasets
+3. To run the PCA analysis run the *pca_analysis.m* script, it will automatically load the results from the feature extraction scripts and present biplot and eigenvector plots of the relevant datasets. For the PCA to run correctly, all feature vectors must have been computed, else it will raise an error.
+
 ## Investigated time series
 
 | **Dataset name**                  | Species           | Condition                               | Context                    |
@@ -25,21 +36,3 @@
 | SCI_trained_207_RW_SPONT_30_10    | Rodent            | Spinal Cord Injury, Trained without EES | bipedal locomotion         |
 | SCI_trained_207_RW_SPONT_BWS40_03 | Rodent            | Spinal Cord Injury, Trained without EES | bipedal locomotion         |
 | SCI_trained_207_RW_SPONT_BWS45_05 | Rodent            | Spinal Cord Injury, Trained without EES | bipedal locomotion         |
-
-
-
-## Data processing pipeline
-
-*List of parameters obtained from EMG and mo-cap :*
-
-| parameter                               | implemented                           |
-| --------------------------------------- | ------------------------------------- |
-| average cycle time                      | computed using the get_cycle function |
-| variance cycle time                     | computed using the get_cycle function |
-| walking velocity                        | fixed for each dataset                |
-| stance duration in cycle proportion     | computed using swing_stance           |
-| step height normalized to stance height |                                       |
-| stance width                            |                                       |
-
-*Motion capture data from the H01_TDM_2kmh timeseries :*
-![mocap_cloud_test](./figures/mocap_cloud_test.jpg)

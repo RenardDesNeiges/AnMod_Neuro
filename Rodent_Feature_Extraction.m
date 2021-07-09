@@ -23,7 +23,7 @@ clear
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %change the time series name here to get features from another dataset
-name = 'SCI_trained_207_RW_SPONT_BWS45_05'; 
+name = 'SCI_trained_207_RW_SPONT_BWS40_03'; 
 
 load(strcat(name,'.mat')); % load the dataset 
 velocity = 2; %velocity in km/h
@@ -459,7 +459,7 @@ s.var_cycle_time = var_cycle_time;                  % in seconds        2
 s.velocity = velocity/3.6;                          % in meter/second   3
 s.avg_stance_proportion = avg_stance_proportion;    % unitless          4
 s.var_stance_proportion = var_stance_proportion;    % unitless          5
-s.avg_step_t = avg_step_height;                     % in mm             6
+s.avg_step_height = avg_step_height;                     % in mm             6
 s.var_step_height = var_step_height;                % in mm             7
 s.height_disymmetry = height_disymmetry;            % unitless          8
 s.foot_amplitude_l = foot_amplitude_l;              % in radients       9

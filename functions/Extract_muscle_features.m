@@ -3,6 +3,6 @@ function [mean_amp,RMS,integ] = Extract_muscle_features(EMG)
 %   Detailed explanation goes here
 mean_amp = mean(EMG);
 RMS = rms(EMG);
-integ = cumtrapz(EMG);
+integ = mean(cumtrapz(EMG));
 end
 

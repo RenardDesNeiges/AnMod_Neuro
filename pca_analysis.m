@@ -1,6 +1,6 @@
 %% Script for PCA 
 
-% loading all (human) datasets
+% loading all datasets
 
 % Available datasets : 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -114,30 +114,13 @@ condition  = [  "Healthy",...
 
 
 data = [];
-if show_plots == true
-    figure
-end
 for i = 1:1:size(datasets,2)
     name = strcat("features/",datasets(i),"_features.mat");
     struct = load(name).s;
     vec = cell2mat(struct2cell(struct));
     vec(isnan(vec))=0;
     data = [data,vec];
-    
-    if show_plots == true
-        subplot(size(datasets,2),1,i)
-        bar(log(vec))
-        tx = title(strcat(...
-            "log scale feature vector, time series : ",...
-            datasets(i))); % avoids interpreting _ as latex
-        set(tx,'Interpreter','none')
-        set(gcf,'color','w');
-    end
 end
-if show_plots
-    sgtitle('Feature vectors for human time series')       
-end
-
 % names of the different variables in the feature vector
 struct = load(strcat("features/",datasets(1),"_features.mat")).s;
 field_names = fieldnames(struct);
@@ -161,17 +144,15 @@ end
 for i = 1:1:size(datasets,2)
     vec = X(i,:);
     if show_plots == true
-        subplot(size(datasets,2),1,i)
+        subplot(7,3,i)
         bar(vec)
-        tx = title(strcat(...
-            "standardized feature vector, time series : ",...
-            datasets(i))); % avoids interpreting _ as latex
-        set(tx,'Interpreter','none')
+         tx = title(datasets(i));
+         set(tx,'Interpreter','none')
         set(gcf,'color','w');
     end
 end
 if show_plots
-    sgtitle('Standardized feature vectors for human time series')       
+    sgtitle('Standardized feature vectors for different time series')       
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -180,13 +161,27 @@ end
 
 
 if show_plots == true
-    % first 4 eigenvectors
+       %    first 4 eigenvectors biplots
        biplot_dimensions(coefs,score,1:2,condition)
        biplot_dimensions(coefs,score,1:2,species)
        biplot_dimensions(coefs,score,2:3,condition)
        biplot_dimensions(coefs,score,2:3,species)
        biplot_dimensions(coefs,score,3:4,condition)
        biplot_dimensions(coefs,score,3:4,species)
-  
+
+       biplot_dimensions(coefs,score,[3, 1],condition)
+       biplot_dimensions(coefs,score,[3, 1],species)
+
+       biplot_dimensions(coefs,score,[4, 1],condition)
+       biplot_dimensions(coefs,score,[4, 1],species)
+
+       biplot_dimensions(coefs,score,[4, 2],condition)
+       biplot_dimensions(coefs,score,[4, 2],species)
+       %    content of the first 4 eigenvectors
+       
+       bar_eigenvector(coefs,1,field_names)
+       bar_eigenvector(coefs,2,field_names)
+       bar_eigenvector(coefs,3,field_names)
+       bar_eigenvector(coefs,4,field_names)
     
 end

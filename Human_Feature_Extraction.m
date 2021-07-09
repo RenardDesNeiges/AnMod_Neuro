@@ -17,7 +17,7 @@ clear
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %change the time series name here to get features from another dataset
-name = 'DM002_TDM_08_1kmh'; 
+name = 'H01_TDM_2kmh'; 
 
 load(strcat(name,'.mat')) % load the dataset 
 velocity = 2; %velocity in km/h
@@ -69,7 +69,7 @@ if show_plots == true
 	plot((0:1:1000)*(1/marker_sr),normalized_y_ankle(500:1500));
     plot(cycle_r( (cycle_r < 15) & (cycle_r > 5) ) - 5,-0.1,'or');
     xlabel("time [s]")
-    ylabel('normalized ankle position (ankle-hip dist) [m]')
+    ylabel('normalized ankle position (ankle-hip dist) [mm]')
     t = title(strcat("cycle start detection for dataset : ", ...
         name)); % avoids interpreting "_" as latex for indice
     set(t,'Interpreter','none')
@@ -122,7 +122,7 @@ if show_plots == true
     xlabel("time [s]")
     ylabel('pitch angle [rad]')
     t = title(strcat(...
-        "foot angle with detection of toe-off/heel-contact",...
+        "foot pitch with detection of toe-off/heel-contact",...
         " events for time series : ",...
         name)); % avoids interpreting _ as latex
     set(t,'Interpreter','none')
@@ -162,6 +162,7 @@ if show_plots == true
     hold on
     plot(max_indices * (1/marker_sr),max_height,'or')
     xlabel("time [s]")
+    ylabel("step height [mm]")
     %ylabel('pitch angle [rad]')
     t = title(strcat(...
         "step (ankle) height with event detection",...
@@ -442,7 +443,7 @@ s.var_cycle_time = var_cycle_time;                  % in seconds        2
 s.velocity = velocity/3.6;                          % in meter/second   3
 s.avg_stance_proportion = avg_stance_proportion;    % unitless          4
 s.var_stance_proportion = var_stance_proportion;    % unitless          5
-s.avg_step_t = avg_step_height;                     % in mm             6
+s.avg_step_height = avg_step_height;                     % in mm             6
 s.var_step_height = var_step_height;                % in mm             7
 s.height_disymmetry = height_disymmetry;            % unitless          8
 s.foot_amplitude_l = foot_amplitude_l;              % in radients       9
