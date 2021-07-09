@@ -9,7 +9,10 @@ To run the data processing pipeline proceed as follow :
    1. *Human_Feature_Extraction.m* processes the human datasets
    2. *NHP_Feature_Extraction.m* processes the non-human primates datasets
    3. *Rodent_Feature_Extraction.m* processes the rodent datasets
-3. To run the PCA analysis run the *pca_analysis.m* script, it will automatically load the results from the feature extraction scripts and present biplot and eigenvector plots of the relevant datasets. For the PCA to run correctly, all feature vectors must have been computed, else it will raise an error.
+3. To run the PCA analysis run the *pca_analysis.m* script, it will automatically load the results from the feature extraction scripts and present biplot and eigenvector plots of the relevant datasets. For the PCA to run correctly, all feature vectors must have been computed, else it will raise an error. There are 3 different scripts to perform the PCA and generate the biplots : 
+   1. *pca_analysis_AS.m* to run PCA on every dataset at once
+   2. *pca_analysis_Humans.m* to run PCA on human datasets 
+   3. *pca_analysis_Rodents.m* to run PCA on rodent datasets 
 
 ## Investigated time series
 
