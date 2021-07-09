@@ -17,7 +17,7 @@ clear
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %change the time series name here to get features from another dataset
-name = 'H01_TDM_2kmh'; 
+name = 'DM002_TDM_08_1kmh'; 
 
 load(strcat(name,'.mat')) % load the dataset 
 velocity = 2; %velocity in km/h
