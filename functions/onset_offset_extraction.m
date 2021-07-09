@@ -1,6 +1,6 @@
 function [onset_id,offset_id,onset_t,offset_t,onset_dt,offset_dt] = ...
     onset_offset_extraction(EMG,delta_t,start_swing,start_stance,sr)
-%ONSET_OFFSET EXTRACTION Computes onsets and ofset indices for an EMG
+%ONSET_OFFSET EXTRACTION Computes onsets and offset indices for an EMG
 %signal
 %   Parameters
 %       - EMG : EMG time series
@@ -9,7 +9,7 @@ function [onset_id,offset_id,onset_t,offset_t,onset_dt,offset_dt] = ...
     start_stance = start_stance*10;
     mean_swing = mean(EMG(:,1))*0.3;
     sd_swing = std(EMG(:,1));
-    threshold = mean_swing+2*sd_swing;
+    threshold = mean_swing+0.5*sd_swing;
     onset_id = [];
     offset_id = [];
 

@@ -17,7 +17,7 @@ clear
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %change the time series name here to get features from another dataset
-name = 'DM002_TDM_08_1kmh'; 
+name = 'DM002_TDM_1kmh_NoEES'; 
 
 load(strcat(name,'.mat')) % load the dataset 
 velocity = 2; %velocity in km/h
@@ -237,6 +237,9 @@ end
        ankle_pitch_vel(knee_l,ankle_l,toe_l);
 [ankle_angular_velocity_r,ankle_angle_r] = ...
     ankle_pitch_vel(knee_r,ankle_r,toe_r);
+
+ankle_angle_l(isnan(ankle_angle_l))=0;
+ankle_angle_r(isnan(ankle_angle_r))=0;
 
 ankle_amplitude_l = 2*sqrt(mean((abs(ankle_angle_l-mean(ankle_angle_l)))));
 ankle_amplitude_r = 2*sqrt(mean((abs(ankle_angle_r-mean(ankle_angle_r)))));
