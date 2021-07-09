@@ -1,10 +1,11 @@
 # Analysis and modelling of Locomotion Homework 3 : PCA analysis of motion-capture and EMG gait parameters
 
+![human_eig_4_1](figures/human_PCA/human_eig_4_1.jpg)
 ## Data processing pipeline
 
 To run the data processing pipeline proceed as follow : 
 
-1. The submitted code does not contain the datasets, place the src file in the same folder as the dataset in order to correctly import the data
+1. The submitted code does not contain the datasets, place the src file in the same folder as the dataset in order to correctly import the dataset 
 2. There are three different scripts for the 3 different species, each script can be made to process all of the datasets from a given species. To select a dataset, set the *name* variable to the dataset to analyze, the list of available names is presented as a comment in the header of each script. The script can be made to plot results by setting the show_plot boolean to **true**. The resulting feature vector is automatically saved in the **features** folder and can in turn be loaded by the PCA script. The scripts files for the different species are the following :
    1. *Human_Feature_Extraction.m* processes the human datasets
    2. *NHP_Feature_Extraction.m* processes the non-human primates datasets
