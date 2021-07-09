@@ -17,7 +17,7 @@ clear
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %change the time series name here to get features from another dataset
-name = 'DM002_TDM_1kmh_NoEES'; 
+name = 'H01_TDM_2kmh'; 
 
 load(strcat(name,'.mat')) % load the dataset 
 velocity = 2; %velocity in km/h
@@ -179,6 +179,9 @@ end
 [knee_angular_velocity_r,knee_angle_r] = ...
     knee_pitch_vel(hip_r,knee_r,ankle_r);
 
+knee_angle_l(isinf(knee_angle_l)|isnan(knee_angle_l))=0;
+knee_angle_r(isinf(knee_angle_r)|isnan(knee_angle_r))=0;
+
 knee_amplitude_l = 2*sqrt(mean((abs(knee_angle_l-mean(knee_angle_l)))));
 knee_amplitude_r = 2*sqrt(mean((abs(knee_angle_r-mean(knee_angle_r)))));
 knee_amp_asymetry = abs((knee_amplitude_l-knee_amplitude_r)/...
@@ -207,6 +210,9 @@ end
 
 [hip_angular_velocity_l,hip_angle_l] = hip_angle_vel(hip_l,knee_l);
 [hip_angular_velocity_r,hip_angle_r] = hip_angle_vel(hip_r,knee_r);
+
+hip_angle_l(isinf(hip_angle_l)|isnan(hip_angle_l))=0;
+hip_angle_r(isinf(hip_angle_r)|isnan(hip_angle_r))=0;
 
 hip_amplitude_l = 2*sqrt(mean((abs(hip_angle_l-mean(hip_angle_l)))));
 hip_amplitude_r = 2*sqrt(mean((abs(hip_angle_r-mean(hip_angle_r)))));
@@ -238,8 +244,8 @@ end
 [ankle_angular_velocity_r,ankle_angle_r] = ...
     ankle_pitch_vel(knee_r,ankle_r,toe_r);
 
-ankle_angle_l(isnan(ankle_angle_l))=0;
-ankle_angle_r(isnan(ankle_angle_r))=0;
+ankle_angle_l(isinf(ankle_angle_l)|isnan(ankle_angle_l))=0;
+ankle_angle_r(isinf(ankle_angle_r)|isnan(ankle_angle_r))=0;
 
 ankle_amplitude_l = 2*sqrt(mean((abs(ankle_angle_l-mean(ankle_angle_l)))));
 ankle_amplitude_r = 2*sqrt(mean((abs(ankle_angle_r-mean(ankle_angle_r)))));

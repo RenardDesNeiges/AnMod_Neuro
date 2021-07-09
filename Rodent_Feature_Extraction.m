@@ -23,7 +23,7 @@ clear
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %change the time series name here to get features from another dataset
-name = 'SCI_trained_207_RW_SPONT_30_08'; 
+name = 'SCI_trained_207_RW_SPONT_BWS45_05'; 
 
 load(strcat(name,'.mat')); % load the dataset 
 velocity = 2; %velocity in km/h
@@ -310,13 +310,16 @@ end
 % flexor : TA ,II, RF
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+padding = 2000;
+
 tmin = 0;
 tmax = size(data.TA,1)/emg_sr;
-t = linspace(tmin,tmax,242900);
+t = linspace(tmin,tmax,size(data.TA,1)-2*padding);
 delta_time = 1200.0 ;
 
-Flexors_left = [data.TA];
-Extensors_left = [data.MG];
+Flexors_left = [data.TA(100:size(data.TA,1)-padding)];
+size(Flexors_left)
+Extensors_left = [data.MG(100:size(data.TA,1)-padding)];
 
 [~,c_F]=size(Flexors_left);
 Flexors_left_filtered = [];
@@ -384,7 +387,7 @@ end
 [Extensors_LMG_Onset_id,Extensors_LMG_Offset_id,...
     Extensors_LMG_Onset_t,Extensors_LMG_Offset_t,...
     Extensors_LMG_Onset_dt,Extensors_LMG_Offset_dt]= ...
-    onset_offset_extraction(Extensors_left_filtered(:,1), delta_time, ...
+    onset_offset_extraction_rodents(Extensors_left_filtered(:,1), delta_time, ...
     stance_starts_indices_l, swing_starts_indices_l,emg_sr);
 
 avg_LMG_Onset_dt = mean(Extensors_LMG_Onset_dt);
@@ -397,7 +400,7 @@ var_LMG_Offset_dt = var(Extensors_LMG_Offset_dt);
 [Flexors_LTA_Onset_id,Flexors_LTA_Offset_id,...
     Flexors_LTA_Onset_t,Flexors_LTA_Offset_t,...
     Flexors_LTA_Onset_dt,Flexors_LTA_Offset_dt]= ...
-    onset_offset_extraction(Flexors_left_filtered(:,1), delta_time, ...
+    onset_offset_extraction_rodents(Flexors_left_filtered(:,1), delta_time, ...
     stance_starts_indices_l, swing_starts_indices_l,emg_sr);
 
 avg_LTA_Onset_dt = mean(Flexors_LTA_Onset_dt);
@@ -418,8 +421,14 @@ if  show_plots
         plot(times,Extensors_left_filtered(:,i))
     end
     hold on
-    plot(Extensors_LMG_Onset_t,0.0001,'or')
-    plot(Extensors_LMG_Offset_t,0.0001,'ob')
+    
+    if size(Extensors_LMG_Onset_t)>  0
+        plot(Extensors_LMG_Onset_t,0.000001,'or')
+    end
+    if size(Extensors_LMG_Offset_t)
+        plot(Extensors_LMG_Offset_t,0.000001,'ob')
+    end
+    
     set(gcf,'color','w');
     sgtitle("Extensors EMG")
     
@@ -430,8 +439,12 @@ if  show_plots
         plot(times,Flexors_left_filtered(:,i))
     end
     hold on
-    plot(Flexors_LTA_Onset_t,0.0001,'or')
-    plot(Flexors_LTA_Offset_t,0.0001,'ob')
+    if size(Flexors_LTA_Onset_t) > 0 
+        plot(Flexors_LTA_Onset_t,0.000001,'or')
+    end
+    if size(Flexors_LTA_Offset_t) > 0
+        plot(Flexors_LTA_Offset_t,0.000001,'ob')
+    end
     set(gcf,'color','w');
     sgtitle("Flexor EMG")
     
