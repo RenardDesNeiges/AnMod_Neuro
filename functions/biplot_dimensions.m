@@ -12,6 +12,7 @@ function biplot_dimensions(coefs,score,dims,oblabels)
     for ii = length(hbi)-length(oblabels):length(hbi)
         userdata = get(hbi(ii), 'UserData');
         if ~isempty(userdata)
+            color = [0 0.75 0];
             if oblabels(userdata) == "Healthy"
                 color = [0 0.75 0];
             elseif oblabels(userdata) == "EES"

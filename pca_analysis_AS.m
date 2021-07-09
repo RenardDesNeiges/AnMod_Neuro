@@ -1,6 +1,4 @@
-%% Script for PCA 
-
-% loading all datasets
+%% Script for multi-species PCA analysis
 
 % Available datasets : 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -42,7 +40,7 @@ set(0,'DefaultFigureWindowStyle','docked')
 show_plots = true; %set to true to display results
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%dataset names
+% loading all datasets and labeling them
 datasets  = [   "H01_TDM_2kmh",...
                 "H01_TDM_35kmh",...
                 "H01_TDM_2kmh_20_incl",...
